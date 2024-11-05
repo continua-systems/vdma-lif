@@ -1,0 +1,32 @@
+{
+  "name": "vdma-lif-gen",
+  "version": "1.0.0.0",
+  "description": "This repository provides **JSON parsers** for the **VDMA - LIF (Layout Interchange Format)**, which is used for defining track layouts and exchanging information between the integrator of driverless transport vehicles and a third-party master control system.",
+  "main": "scripts/generateCode.ts",
+  "scripts": {
+    "generate": "tsx scripts/generateCode.ts",
+    "generate:all": "npm run generate:csharp && npm run generate:python && npm run generate:typescript",
+    "generate:csharp": "npm run generate config/csharp.json",
+    "generate:python": "npm run generate config/python.json",
+    "generate:typescript": "npm run generate config/typescript.json",
+    "publish:csharp": "tsx scripts/publish-nuget.ts config/csharp.json",
+    "publish:python": "tsx scripts/publish-pypi.ts config/python.json",
+    "publish:typescript": "tsx scripts/publish-npm.ts config/typescript.json"
+  },
+  "author": "Continua Systems GmbH <info@continua.systems> (https://continua.systems)",
+  "bugs": {
+    "email": "info@continua.systems",
+    "url": "https://github.com/continua-systems/vdma-lif"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "quicktype-core": "^23.0.170"
+  },
+  "devDependencies": {
+    "@types/node": "^22.8.7",
+    "dotenv": "^16.4.5",
+    "prettier": "^3.3.3",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

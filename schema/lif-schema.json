@@ -1,0 +1,389 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "LIF Layout Interchange Format",
+    "type": "object",
+    "properties": {
+        "metaInformation": {
+            "type": "object",
+            "description": "Contains metadata about the project and the LIF file.",
+            "properties": {
+                "projectIdentification": {
+                    "type": "string",
+                    "description": "Human-readable name of the project (e.g., for display purposes)."
+                },
+                "creator": {
+                    "type": "string",
+                    "description": "Creator of the LIF file (e.g., name of company or person)."
+                },
+                "exportTimestamp": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The timestamp at which this LIF file was created/updated/modified. Format is ISO8601 in UTC."
+                },
+                "lifVersion": {
+                    "type": "string",
+                    "description": "Version of the LIF file format. Follows semantic versioning (Major.Minor.Patch)."
+                }
+            },
+            "required": [
+                "projectIdentification",
+                "creator",
+                "exportTimestamp",
+                "lifVersion"
+            ]
+        },
+        "layouts": {
+            "type": "array",
+            "description": "Collection of layouts used in the facility by the driverless transport system. All layouts refer to the same global origin.",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "layoutId": {
+                        "type": "string",
+                        "description": "Unique identifier for the layout."
+                    },
+                    "layoutName": {
+                        "type": "string",
+                        "description": "Name of the layout."
+                    },
+                    "layoutVersion": {
+                        "type": "string",
+                        "description": "Version number of the layout. It is suggested that this be an integer, represented as a string, incremented with each change, starting at 1."
+                    },
+                    "layoutLevelId": {
+                        "type": "string",
+                        "description": "Unique identifier for the layout level."
+                    },
+                    "layoutDescription": {
+                        "type": "string",
+                        "description": "Description of the layout. *Optional*."
+                    },
+                    "nodes": {
+                        "type": "array",
+                        "description": "List of nodes in the layout. Nodes are locations where vehicles can navigate to.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "nodeId": {
+                                    "type": "string",
+                                    "description": "Unique identifier for the node."
+                                },
+                                "nodeName": {
+                                    "type": "string",
+                                    "description": "Name of the node. *Optional*."
+                                },
+                                "nodeDescription": {
+                                    "type": "string",
+                                    "description": "Description of the node. *Optional*."
+                                },
+                                "mapId": {
+                                    "type": "string",
+                                    "description": "Identifier for the map that this node belongs to. *Optional*."
+                                },
+                                "nodePosition": {
+                                    "type": "object",
+                                    "description": "Position of the node on the map (in meters).",
+                                    "properties": {
+                                        "x": {
+                                            "type": "number",
+                                            "description": "X coordinate of the node in meters. Range: [float64.min ... float64.max]"
+                                        },
+                                        "y": {
+                                            "type": "number",
+                                            "description": "Y coordinate of the node in meters. Range: [float64.min... float64.max]"
+                                        }
+                                    },
+                                    "required": [
+                                        "x",
+                                        "y"
+                                    ]
+                                },
+                                "vehicleTypeNodeProperties": {
+                                    "type": "array",
+                                    "description": "Vehicle-specific properties related to the node.",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "vehicleTypeId": {
+                                                "type": "string",
+                                                "description": "Identifier for the vehicle type."
+                                            },
+                                            "theta": {
+                                                "type": "number",
+                                                "description": "Absolute orientation of the vehicle on the node in reference to the global origin’s rotation. Range: [-Pi ... Pi]"
+                                            },
+                                            "actions": {
+                                                "type": "array",
+                                                "description": "List of actions that the vehicle can perform at the node. *Optional*.",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "actionType": {
+                                                            "type": "string",
+                                                            "description": "Type of action (e.g., move, load, unload)."
+                                                        },
+                                                        "actionDescription": {
+                                                            "type": "string",
+                                                            "description": "Description of the action. *Optional*."
+                                                        },
+                                                        "required": {
+                                                            "type": "boolean",
+                                                            "description": "Whether the action is mandatory."
+                                                        },
+                                                        "blockingType": {
+                                                            "type": "string",
+                                                            "description": "Specifies if the action is blocking (HARD or SOFT)."
+                                                        },
+                                                        "actionParameters": {
+                                                            "type": "array",
+                                                            "description": "Parameters associated with the action. *Optional*.",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "key": {
+                                                                        "type": "string",
+                                                                        "description": "Key of the action parameter."
+                                                                    },
+                                                                    "value": {
+                                                                        "type": "string",
+                                                                        "description": "Value of the action parameter."
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "required": [
+                                            "vehicleTypeId",
+                                            "theta"
+                                        ]
+                                    }
+                                }
+                            },
+                            "required": [
+                                "nodeId",
+                                "nodePosition",
+                                "vehicleTypeNodeProperties"
+                            ]
+                        }
+                    },
+                    "edges": {
+                        "type": "array",
+                        "description": "List of edges in the layout. Edges represent paths between nodes.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "edgeId": {
+                                    "type": "string",
+                                    "description": "Unique identifier for the edge."
+                                },
+                                "startNodeId": {
+                                    "type": "string",
+                                    "description": "ID of the starting node for this edge."
+                                },
+                                "endNodeId": {
+                                    "type": "string",
+                                    "description": "ID of the ending node for this edge."
+                                },
+                                "vehicleTypeEdgeProperties": {
+                                    "type": "array",
+                                    "description": "Vehicle-specific properties for the edge.",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "vehicleTypeId": {
+                                                "type": "string",
+                                                "description": "Identifier for the vehicle type."
+                                            },
+                                            "vehicleOrientation": {
+                                                "type": "number",
+                                                "description": "Orientation of the vehicle while traversing the edge, in degrees. Range: [0.0 ... 360.0]"
+                                            },
+                                            "orientationType": {
+                                                "type": "string",
+                                                "description": "Type of orientation (e.g., TANGENTIAL)."
+                                            },
+                                            "rotationAllowed": {
+                                                "type": "boolean",
+                                                "description": "Indicates if rotation is allowed while on the edge. *Optional*."
+                                            },
+                                            "rotationAtStartNodeAllowed": {
+                                                "type": "string",
+                                                "description": "Specifies if rotation is allowed at the start node. *Optional*."
+                                            },
+                                            "rotationAtEndNodeAllowed": {
+                                                "type": "string",
+                                                "description": "Specifies if rotation is allowed at the end node. *Optional*."
+                                            },
+                                            "maxSpeed": {
+                                                "type": "number",
+                                                "description": "Maximum speed allowed on this edge in meters per second. Range: [0.0 ... float64.max]"
+                                            },
+                                            "maxRotationSpeed": {
+                                                "type": "number",
+                                                "description": "Maximum rotation speed allowed on this edge in radians per second. *Optional*. Range: [0.0 ... float64.max]"
+                                            },
+                                            "minHeight": {
+                                                "type": "number",
+                                                "description": "Minimum height of the vehicle on this edge in meters. *Optional*. Range: [0.0 ... float64.max]"
+                                            },
+                                            "maxHeight": {
+                                                "type": "number",
+                                                "description": "Maximum height of the vehicle on this edge in meters. *Optional*. Range: [0.0 ... float64.max]"
+                                            },
+                                            "loadRestriction": {
+                                                "type": "object",
+                                                "description": "Load restrictions for this edge. *Optional*.",
+                                                "properties": {
+                                                    "unloaded": {
+                                                        "type": "boolean",
+                                                        "description": "Indicates if the edge can be traversed without a load."
+                                                    },
+                                                    "loaded": {
+                                                        "type": "boolean",
+                                                        "description": "Indicates if the edge can be traversed with a load."
+                                                    },
+                                                    "loadSetNames": {
+                                                        "type": "array",
+                                                        "description": "Names of the load sets allowed on this edge. *Optional*.",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "trajectory": {
+                                                "type": "object",
+                                                "description": "Trajectory information for this edge, if applicable. *Optional*.",
+                                                "properties": {
+                                                    "degree": {
+                                                        "type": "integer",
+                                                        "description": "Degree of the trajectory curve. Default is 3. Range: [1 ... 3]",
+                                                        "default": 3
+                                                    },
+                                                    "knotVector": {
+                                                        "type": "array",
+                                                        "description": "Knot vector for the trajectory. *Optional*.",
+                                                        "items": {
+                                                            "type": "number"
+                                                        }
+                                                    },
+                                                    "controlPoints": {
+                                                        "type": "array",
+                                                        "description": "Control points defining the trajectory. *Optional*.",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "x": {
+                                                                    "type": "number",
+                                                                    "description": "X coordinate of the control point in meters."
+                                                                },
+                                                                "y": {
+                                                                    "type": "number",
+                                                                    "description": "Y coordinate of the control point in meters."
+                                                                },
+                                                                "weight": {
+                                                                    "type": "number",
+                                                                    "description": "The weight with which this control point pulls on the curve. When not defined, the default is 1.0. Range: [0.0 ... float64.max]",
+                                                                    "default": 1.0
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "x",
+                                                                "y"
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "required": [
+                                            "vehicleTypeId",
+                                            "vehicleOrientation"
+                                        ]
+                                    }
+                                }
+                            },
+                            "required": [
+                                "edgeId",
+                                "startNodeId",
+                                "endNodeId",
+                                "vehicleTypeEdgeProperties"
+                            ]
+                        }
+                    },
+                    "stations": {
+                        "type": "array",
+                        "description": "List of stations in the layout where vehicles perform specific actions.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "stationId": {
+                                    "type": "string",
+                                    "description": "Unique identifier for the station."
+                                },
+                                "interactionNodeIds": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "description": "List of node IDs where the station interacts."
+                                },
+                                "stationName": {
+                                    "type": "string",
+                                    "description": "Name of the station. *Optional*."
+                                },
+                                "stationDescription": {
+                                    "type": "string",
+                                    "description": "Description of the station. *Optional*."
+                                },
+                                "stationHeight": {
+                                    "type": "number",
+                                    "description": "Height of the station, if applicable, in meters. *Optional*. Range: [0.0 ... float64.max]"
+                                },
+                                "stationPosition": {
+                                    "type": "object",
+                                    "description": "Position of the station on the map (in meters).",
+                                    "properties": {
+                                        "x": {
+                                            "type": "number",
+                                            "description": "X coordinate of the station in meters. Range: [float64.min ... float64.max]"
+                                        },
+                                        "y": {
+                                            "type": "number",
+                                            "description": "Y coordinate of the station in meters. Range: [float64.min ... float64.max]"
+                                        },
+                                        "theta": {
+                                            "type": "number",
+                                            "description": "Orientation of the station. Unit: radians. Range: [-Pi ... Pi]"
+                                        }
+                                    },
+                                    "required": [
+                                        "x",
+                                        "y"
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "stationId",
+                                "interactionNodeIds",
+                                "stationPosition"
+                            ]
+                        }
+                    }
+                },
+                "required": [
+                    "layoutId",
+                    "nodes",
+                    "edges"
+                ]
+            }
+        }
+    },
+    "required": [
+        "metaInformation",
+        "layouts"
+    ]
+}

@@ -1,0 +1,20 @@
+{
+  "outputFile": "Vdma.Lif/LifModels.cs",
+  "outputDirectory": "src/csharp",
+  "prepend": "// ReSharper disable PropertyCanBeMadeInitOnly.Global\n// ReSharper disable ClassNeverInstantiated.Global\n// ReSharper disable PartialTypeWithSinglePart\n// ReSharper disable UnusedAutoPropertyAccessor.Global\n// ReSharper disable UnusedMember.Global\n\n#pragma warning disable CS8618\n#pragma warning disable CS8601\n#pragma warning disable CS8603\n",
+  "language": "csharp",
+  "renderOptions": {
+    "namespace": "Vdma.Lif",
+    "csharp-version": 6,
+    "features": "attributes-only",
+    "framework": "SystemTextJson"
+  },
+  "cleanupCommand": "jb cleanupcode Vdma.Lif.sln",
+  "testCommand": "dotnet test",
+  "buildCommand": "dotnet pack",
+  "publish": {
+    "packageName": "Vdma.Lif",
+    "packageVersion": "1.0.0.1",
+    "packageDirectory": "Vdma.Lif/bin/Release"
+  }
+}

@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <PackageId>Vdma.Lif</PackageId>
+        <Version>1.0.0.1</Version>
+        <Authors>Marc Walker</Authors>
+        <Company>Continua Systems GmbH</Company>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>JSON;VDMA;LIF;VDA5050</PackageTags>
+        <RepositoryUrl>https://github.com/continua-systems/vdma-lif.git</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <Description>
+        JSON parsers and models for the VDMA - LIF (Layout Interchange Format), which is used for defining track layouts and exchanging information between the integrator of driverless transport vehicles and a third-party master control system.
+        </Description>
+
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="../README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+</Project>

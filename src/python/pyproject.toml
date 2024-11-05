@@ -1,0 +1,30 @@
+# pyproject.toml
+
+[build-system]
+requires      = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vdma-lif"
+version = "1.0.0.4"
+description = "JSON parsers and models for the VDMA - LIF (Layout Interchange Format), which is used for defining track layouts and exchanging information between the integrator of driverless transport vehicles and a third-party master control system."
+readme = "README.md"
+authors = [{ name = "Continua Systems GmbH", email = "info@continua.systems" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["json", "vdma", "lif", "vda5050"]
+dependencies = [
+    'python-dateutil'
+]
+requires-python = ">=3.7"
+
+[project.optional-dependencies]
+dev = ["pip-tools", "autopep8" ]
+
+[project.urls]
+Homepage = "https://github.com/continua-systems/vdma-lif.git"
+

@@ -1,0 +1,39 @@
+{
+  "name": "vdma-lif",
+  "version": "1.0.0-1",
+  "description": "JSON parsers and models for the VDMA - LIF (Layout Interchange Format), which is used for defining track layouts and exchanging information between the integrator of driverless transport vehicles and a third-party master control system.",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "prepublish": "tsc",
+  "scripts": {
+    "build": "tsc",
+    "test": "ts-mocha src/**/*.spec.ts",
+    "format": "prettier --write src/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/continua-systems/vdma-lif.git"
+  },
+  "keywords": [
+    "json",
+    "vdma",
+    "lif",
+    "vda5050"
+  ],
+  "readme": "README.md",
+  "author": "Continua Systems GmbH",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/continua-systems/vdma-lif/issues"
+  },
+  "homepage": "https://github.com/continua-systems/vdma-lif#readme",
+  "devDependencies": {
+    "@types/chai": "^5.0.1",
+    "@types/mocha": "^10.0.9",
+    "chai": "^5.1.2",
+    "mocha": "^10.8.2",
+    "prettier": "^3.3.3",
+    "ts-mocha": "^10.0.0",
+    "typescript": "^5.6.3"
+  }
+}

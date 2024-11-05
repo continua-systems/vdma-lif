@@ -1,0 +1,17 @@
+{
+  "language": "python",
+  "outputDirectory": "src/python",
+  "outputFile": "vdma_lif/models.py",
+  "pythonPackage": "vdma-lif",
+  "renderOptions": {
+    "python-version": "3.7"
+  },
+  "cleanupCommand": "autopep8 --in-place --aggressive vdma_lif/*.py",
+  "testCommand": "python -m unittest tests/test_lif_parser.py",
+  "buildCommand": "python -m build",
+  "publish": {
+    "packageName": "vdma_lif",
+    "packageVersion": "1.0.0.4",
+    "packageDirectory": "dist"
+  }
+}

@@ -1,0 +1,80 @@
+# Common
+*.log
+*.tmp
+.DS_Store
+.idea/
+.vscode/
+node_modules/
+dist/
+build/
+tmp/
+.env
+.env.local
+coverage/
+
+# C# (.NET)
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.vs/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+.venv/
+.env/
+pip-wheel-metadata/
+*.egg-info/
+*.egg
+*.manifest
+*.spec
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+Godeps/
+
+# JavaScript / TypeScript
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+.pnp/
+.pnp.js
+
+# Rust
+/target/
+/Cargo.lock
+*.rs.bk
+
+# Ruby
+*.gem
+*.rbc
+.ruby-version
+.ruby-gemset
+.redcar/
+.sass-cache/
+.bundle/
+yardoc/
+_yardoc/
+coverage/
+tmp/
+Gemfile.lock
+log/

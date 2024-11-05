@@ -1,0 +1,167 @@
+{
+  "metaInformation": {
+    "projectIdentification": "Sample Project",
+    "creator": "Sample Creator",
+    "exportTimestamp": "2069-07-21T00:37:33Z",
+    "lifVersion": "1.0.0"
+  },
+  "layouts": [
+    {
+      "layoutId": "layout-001",
+      "layoutName": "Main Layout",
+      "layoutVersion": "1.1",
+      "layoutLevelId": "level-001",
+      "layoutDescription": "Primary layout for testing.",
+      "nodes": [
+        {
+          "nodeId": "node-001",
+          "nodeName": "Node A",
+          "nodeDescription": "Entrance node.",
+          "mapId": "map-001",
+          "nodePosition": {
+            "x": 1000.0,
+            "y": 1500.0
+          },
+          "vehicleTypeNodeProperties": [
+            {
+              "vehicleTypeId": "vehicle-001",
+              "theta": 90.0,
+              "actions": [
+                {
+                  "actionType": "move",
+                  "actionDescription": "Move forward",
+                  "required": true,
+                  "blockingType": "HARD",
+                  "actionParameters": [
+                    {
+                      "key": "speed",
+                      "value": "fast"
+                    },
+                    {
+                      "key": "acceleration",
+                      "value": "medium"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "vehicleTypeId": "vehicle-002",
+              "theta": 180.0,
+              "actions": [
+                {
+                  "actionType": "load",
+                  "actionDescription": "Load cargo",
+                  "required": false,
+                  "blockingType": "SOFT"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "nodeId": "node-002",
+          "nodeName": "Node B",
+          "nodePosition": {
+            "x": 2000.0,
+            "y": 2500.0
+          },
+          "vehicleTypeNodeProperties": [
+            {
+              "vehicleTypeId": "vehicle-001",
+              "theta": 45.0
+            }
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "edgeId": "edge-001",
+          "startNodeId": "node-001",
+          "endNodeId": "node-002",
+          "vehicleTypeEdgeProperties": [
+            {
+              "vehicleTypeId": "vehicle-001",
+              "vehicleOrientation": 0.0,
+              "orientationType": "TANGENTIAL",
+              "rotationAllowed": true,
+              "maxSpeed": 1.5,
+              "maxRotationSpeed": 0.5,
+              "loadRestriction": {
+                "unloaded": true,
+                "loaded": false,
+                "loadSetNames": ["set1", "set2"]
+              },
+              "trajectory": {
+                "degree": 3,
+                "knotVector": [0, 1, 2],
+                "controlPoints": [
+                  { "x": 1000.0, "y": 1500.0, "weight": 1.0 },
+                  { "x": 2000.0, "y": 2500.0, "weight": 0.8 }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "edgeId": "edge-002",
+          "startNodeId": "node-002",
+          "endNodeId": "node-001",
+          "vehicleTypeEdgeProperties": [
+            {
+              "vehicleTypeId": "vehicle-002",
+              "vehicleOrientation": 180.0,
+              "orientationType": "TANGENTIAL",
+              "rotationAllowed": false,
+              "maxSpeed": 2.0
+            }
+          ]
+        }
+      ],
+      "stations": [
+        {
+          "stationId": "station-001",
+          "interactionNodeIds": ["node-001", "node-002"],
+          "stationName": "Station A",
+          "stationDescription": "Primary loading station.",
+          "stationPosition": {
+            "x": 1000.0,
+            "y": 1000.0,
+            "theta": 0.0
+          }
+        },
+        {
+          "stationId": "station-002",
+          "interactionNodeIds": ["node-002"],
+          "stationPosition": {
+            "x": 2000.0,
+            "y": 2000.0
+          }
+        }
+      ]
+    },
+    {
+      "layoutId": "layout-002",
+      "layoutName": "Secondary Layout",
+      "layoutVersion": "1.0",
+      "layoutLevelId": "level-002",
+      "nodes": [
+        {
+          "nodeId": "node-003",
+          "nodePosition": {
+            "x": 3000.0,
+            "y": 3500.0
+          },
+          "vehicleTypeNodeProperties": [
+            {
+              "vehicleTypeId": "vehicle-003",
+              "theta": 270.0
+            }
+          ]
+        }
+      ],
+      "edges": [],
+      "stations": []
+    }
+  ]
+}
