@@ -1,0 +1,8 @@
+{
+  "language": "typescript",
+  "outputDirectory": "src/typescript/",
+  "outputFile": "src/lifModels.ts",
+  "buildCommand": "npm run build",
+  "testCommand": "npm run build && npm test",
+  "cleanupCommand": "npm run format"
+}
