@@ -62,6 +62,9 @@ describe("LIFParser", () => {
     expect(action1.actionParameters![0].key).to.equal("speed");
     expect(action1.actionParameters![0].value).to.equal("fast");
 
+    const vehicleType2 = node1.vehicleTypeNodeProperties[1];
+    expect(vehicleType2.vehicleTypeId).to.equal("vehicle-002");
+
     // Layout Edges
     const edge1 = layout1.edges[0];
     expect(edge1.edgeId).to.equal("edge-001");

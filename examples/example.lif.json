@@ -68,8 +68,7 @@
           },
           "vehicleTypeNodeProperties": [
             {
-              "vehicleTypeId": "vehicle-001",
-              "theta": 45.0
+              "vehicleTypeId": "vehicle-002"
             }
           ]
         }

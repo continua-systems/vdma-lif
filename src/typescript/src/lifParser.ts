@@ -1,5 +1,5 @@
 import fs from "fs";
-import { Convert, LIFLayoutCollection } from "./lifModels";
+import { Convert, type LIFLayoutCollection } from "./lifModels";
 
 export class LIFParser {
   static fromJson(jsonData: string): LIFLayoutCollection | null {

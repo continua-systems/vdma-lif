@@ -156,8 +156,7 @@
                                             }
                                         },
                                         "required": [
-                                            "vehicleTypeId",
-                                            "theta"
+                                            "vehicleTypeId"
                                         ]
                                     }
                                 }

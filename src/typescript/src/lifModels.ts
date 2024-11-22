@@ -239,7 +239,7 @@ export interface VehicleTypeNodeProperty {
    * Absolute orientation of the vehicle on the node in reference to the global origin’s
    * rotation. Range: [-Pi ... Pi]
    */
-  theta: number;
+  theta?: number;
   /**
    * Identifier for the vehicle type.
    */
@@ -682,7 +682,7 @@ const typeMap: any = {
   VehicleTypeNodeProperty: o(
     [
       { json: "actions", js: "actions", typ: u(undefined, a(r("Action"))) },
-      { json: "theta", js: "theta", typ: 3.14 },
+      { json: "theta", js: "theta", typ: u(undefined, 3.14) },
       { json: "vehicleTypeId", js: "vehicleTypeId", typ: "" },
     ],
     "any",

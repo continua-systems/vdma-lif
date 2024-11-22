@@ -374,31 +374,33 @@ class Action:
 
 @dataclass
 class VehicleTypeNodeProperty:
-    theta: float
-    """Absolute orientation of the vehicle on the node in reference to the global origin’s
-    rotation. Range: [-Pi ... Pi]
-    """
     vehicle_type_id: str
     """Identifier for the vehicle type."""
 
     actions: Optional[List[Action]] = None
     """List of actions that the vehicle can perform at the node. *Optional*."""
 
+    theta: Optional[float] = None
+    """Absolute orientation of the vehicle on the node in reference to the global origin’s
+    rotation. Range: [-Pi ... Pi]
+    """
+
     @staticmethod
     def from_dict(obj: Any) -> 'VehicleTypeNodeProperty':
         assert isinstance(obj, dict)
-        theta = from_float(obj.get("theta"))
         vehicle_type_id = from_str(obj.get("vehicleTypeId"))
         actions = from_union([lambda x: from_list(Action.from_dict, x), from_none], obj.get("actions"))
-        return VehicleTypeNodeProperty(theta, vehicle_type_id, actions)
+        theta = from_union([from_float, from_none], obj.get("theta"))
+        return VehicleTypeNodeProperty(vehicle_type_id, actions, theta)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["theta"] = to_float(self.theta)
         result["vehicleTypeId"] = from_str(self.vehicle_type_id)
         if self.actions is not None:
             result["actions"] = from_union([lambda x: from_list(
                 lambda x: to_class(Action, x), x), from_none], self.actions)
+        if self.theta is not None:
+            result["theta"] = from_union([to_float, from_none], self.theta)
         return result
 
 

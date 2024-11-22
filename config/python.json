@@ -11,7 +11,7 @@
   "buildCommand": "python -m build",
   "publish": {
     "packageName": "vdma_lif",
-    "packageVersion": "1.0.0.4",
+    "packageVersion": "1.0.0.5",
     "packageDirectory": "dist"
   }
 }

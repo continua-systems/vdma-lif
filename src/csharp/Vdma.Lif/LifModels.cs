@@ -350,8 +350,9 @@ public partial class VehicleTypeNodeProperty
     ///     Absolute orientation of the vehicle on the node in reference to the global origin’s
     ///     rotation. Range: [-Pi ... Pi]
     /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("theta")]
-    public double Theta { get; set; }
+    public double? Theta { get; set; }
 
     /// <summary>
     ///     Identifier for the vehicle type.
