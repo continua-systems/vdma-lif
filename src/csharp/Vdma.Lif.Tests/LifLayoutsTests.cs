@@ -87,15 +87,16 @@ public class LifLayoutsTests
         Assert.Equal(90.0, vehicleType1.Theta);
 
         // Actions for Vehicle Type 1
+        Assert.NotNull(vehicleType1.Actions);
         Assert.Single(vehicleType1.Actions);
         var action1 = vehicleType1.Actions[0];
         Assert.Equal("move", action1.ActionType);
         Assert.Equal("Move forward", action1.ActionDescription);
         Assert.True(action1.ActionRequired);
-        Assert.Equal("HARD", action1.BlockingType);
-        Assert.Equal(2, action1.ActionParameters.Length);
-        Assert.Equal("speed", action1.ActionParameters[0].Key);
-        Assert.Equal("fast", action1.ActionParameters[0].Value);
+        Assert.Equal("HARD", action1?.BlockingType);
+        Assert.Equal(2, action1?.ActionParameters?.Length);
+        Assert.Equal("speed", action1?.ActionParameters?[0].Key);
+        Assert.Equal("fast", action1?.ActionParameters?[0].Value);
 
         // Edges
         Assert.Equal(2, layout1.Edges.Length);
@@ -113,20 +114,20 @@ public class LifLayoutsTests
         Assert.True(edgeVehicleType1.RotationAllowed);
         Assert.Equal(1.5, edgeVehicleType1.MaxSpeed);
         Assert.Equal(0.5, edgeVehicleType1.MaxRotationSpeed);
-        Assert.True(edgeVehicleType1.LoadRestriction.Unloaded);
-        Assert.False(edgeVehicleType1.LoadRestriction.Loaded);
-        Assert.Equal(new[] { "set1", "set2" }, edgeVehicleType1.LoadRestriction.LoadSetNames);
+        Assert.True(edgeVehicleType1.LoadRestriction?.Unloaded);
+        Assert.False(edgeVehicleType1.LoadRestriction?.Loaded);
+        Assert.Equal(["set1", "set2"], edgeVehicleType1.LoadRestriction?.LoadSetNames);
 
         // Stations
-        Assert.Equal(2, layout1.Stations.Length);
-        var station1 = layout1.Stations[0];
-        Assert.Equal("station-001", station1.StationId);
-        Assert.Equal(["node-001", "node-002"], station1.InteractionNodeIds);
-        Assert.Equal("Station A", station1.StationName);
-        Assert.Equal("Primary loading station.", station1.StationDescription);
-        Assert.Equal(1000.0, station1.StationPosition.X);
-        Assert.Equal(1000.0, station1.StationPosition.Y);
-        Assert.Equal(0.0, station1.StationPosition.Theta);
+        Assert.Equal(2, layout1.Stations?.Length);
+        var station1 = layout1.Stations?[0];
+        Assert.Equal("station-001", station1?.StationId);
+        Assert.Equal(["node-001", "node-002"], station1?.InteractionNodeIds);
+        Assert.Equal("Station A", station1?.StationName);
+        Assert.Equal("Primary loading station.", station1?.StationDescription);
+        Assert.Equal(1000.0, station1?.StationPosition.X);
+        Assert.Equal(1000.0, station1?.StationPosition.Y);
+        Assert.Equal(0.0, station1?.StationPosition.Theta);
 
         // Second Layout
         var layout2 = schema.Layouts[1];
@@ -147,6 +148,7 @@ public class LifLayoutsTests
 
         // No edges and stations in the second layout
         Assert.Empty(layout2.Edges);
+        Assert.NotNull(layout2.Stations);
         Assert.Empty(layout2.Stations);
     }
 }

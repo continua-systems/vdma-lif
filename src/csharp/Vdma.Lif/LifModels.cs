@@ -41,7 +41,7 @@ public partial class Layout
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("layoutDescription")]
-    public string LayoutDescription { get; set; }
+    public string? LayoutDescription { get; set; }
 
     /// <summary>
     ///     Unique identifier for the layout.
@@ -54,14 +54,14 @@ public partial class Layout
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("layoutLevelId")]
-    public string LayoutLevelId { get; set; }
+    public string? LayoutLevelId { get; set; }
 
     /// <summary>
     ///     Name of the layout.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("layoutName")]
-    public string LayoutName { get; set; }
+    public string? LayoutName { get; set; }
 
     /// <summary>
     ///     Version number of the layout. It is suggested that this be an integer, represented as a
@@ -69,7 +69,7 @@ public partial class Layout
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("layoutVersion")]
-    public string LayoutVersion { get; set; }
+    public string? LayoutVersion { get; set; }
 
     /// <summary>
     ///     List of nodes in the layout. Nodes are locations where vehicles can navigate to.
@@ -82,7 +82,7 @@ public partial class Layout
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("stations")]
-    public Station[] Stations { get; set; }
+    public Station[]? Stations { get; set; }
 }
 
 public partial class Edge
@@ -119,7 +119,7 @@ public partial class VehicleTypeEdgeProperty
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("loadRestriction")]
-    public LoadRestriction LoadRestriction { get; set; }
+    public LoadRestriction? LoadRestriction { get; set; }
 
     /// <summary>
     ///     Maximum height of the vehicle on this edge in meters. *Optional*. Range: [0.0 ...
@@ -157,7 +157,7 @@ public partial class VehicleTypeEdgeProperty
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("orientationType")]
-    public string OrientationType { get; set; }
+    public string? OrientationType { get; set; }
 
     /// <summary>
     ///     Indicates if rotation is allowed while on the edge. *Optional*.
@@ -171,21 +171,21 @@ public partial class VehicleTypeEdgeProperty
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("rotationAtEndNodeAllowed")]
-    public string RotationAtEndNodeAllowed { get; set; }
+    public string? RotationAtEndNodeAllowed { get; set; }
 
     /// <summary>
     ///     Specifies if rotation is allowed at the start node. *Optional*.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("rotationAtStartNodeAllowed")]
-    public string RotationAtStartNodeAllowed { get; set; }
+    public string? RotationAtStartNodeAllowed { get; set; }
 
     /// <summary>
     ///     Trajectory information for this edge, if applicable. *Optional*.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("trajectory")]
-    public Trajectory Trajectory { get; set; }
+    public Trajectory? Trajectory { get; set; }
 
     /// <summary>
     ///     Orientation of the vehicle while traversing the edge, in degrees. Range: [0.0 ... 360.0]
@@ -217,7 +217,7 @@ public partial class LoadRestriction
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("loadSetNames")]
-    public string[] LoadSetNames { get; set; }
+    public string[]? LoadSetNames { get; set; }
 
     /// <summary>
     ///     Indicates if the edge can be traversed without a load.
@@ -237,7 +237,7 @@ public partial class Trajectory
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("controlPoints")]
-    public ControlPoint[] ControlPoints { get; set; }
+    public ControlPoint[]? ControlPoints { get; set; }
 
     /// <summary>
     ///     Degree of the trajectory curve. Default is 3. Range: [1 ... 3]
@@ -251,7 +251,7 @@ public partial class Trajectory
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("knotVector")]
-    public double[] KnotVector { get; set; }
+    public double[]? KnotVector { get; set; }
 }
 
 public partial class ControlPoint
@@ -284,14 +284,14 @@ public partial class Node
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("mapId")]
-    public string MapId { get; set; }
+    public string? MapId { get; set; }
 
     /// <summary>
     ///     Description of the node. *Optional*.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("nodeDescription")]
-    public string NodeDescription { get; set; }
+    public string? NodeDescription { get; set; }
 
     /// <summary>
     ///     Unique identifier for the node.
@@ -304,7 +304,7 @@ public partial class Node
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("nodeName")]
-    public string NodeName { get; set; }
+    public string? NodeName { get; set; }
 
     /// <summary>
     ///     Position of the node on the map (in meters).
@@ -344,7 +344,7 @@ public partial class VehicleTypeNodeProperty
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("actions")]
-    public Action[] Actions { get; set; }
+    public Action[]? Actions { get; set; }
 
     /// <summary>
     ///     Absolute orientation of the vehicle on the node in reference to the global origin’s
@@ -368,28 +368,28 @@ public partial class Action
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("actionDescription")]
-    public string ActionDescription { get; set; }
+    public string? ActionDescription { get; set; }
 
     /// <summary>
     ///     Parameters associated with the action. *Optional*.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("actionParameters")]
-    public ActionParameter[] ActionParameters { get; set; }
+    public ActionParameter[]? ActionParameters { get; set; }
 
     /// <summary>
     ///     Type of action (e.g., move, load, unload).
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("actionType")]
-    public string ActionType { get; set; }
+    public string? ActionType { get; set; }
 
     /// <summary>
     ///     Specifies if the action is blocking (HARD or SOFT).
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("blockingType")]
-    public string BlockingType { get; set; }
+    public string? BlockingType { get; set; }
 
     /// <summary>
     ///     Whether the action is mandatory.
@@ -406,14 +406,14 @@ public partial class ActionParameter
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("key")]
-    public string Key { get; set; }
+    public string? Key { get; set; }
 
     /// <summary>
     ///     Value of the action parameter.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("value")]
-    public string Value { get; set; }
+    public string? Value { get; set; }
 }
 
 public partial class Station
@@ -429,7 +429,7 @@ public partial class Station
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("stationDescription")]
-    public string StationDescription { get; set; }
+    public string? StationDescription { get; set; }
 
     /// <summary>
     ///     Height of the station, if applicable, in meters. *Optional*. Range: [0.0 ... float64.max]
@@ -449,7 +449,7 @@ public partial class Station
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("stationName")]
-    public string StationName { get; set; }
+    public string? StationName { get; set; }
 
     /// <summary>
     ///     Position of the station on the map (in meters).

@@ -14,7 +14,7 @@
   "buildCommand": "dotnet pack",
   "publish": {
     "packageName": "Vdma.Lif",
-    "packageVersion": "1.0.0.2",
+    "packageVersion": "1.0.0.3",
     "packageDirectory": "Vdma.Lif/bin/Release"
   }
 }

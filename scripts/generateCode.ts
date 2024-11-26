@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { execSync } from 'child_process';
 import { LanguageConfig } from '../config/config';
+import {OptionalAwareCSharpTargetLanguage} from "./language/CustomCsharp";
 
 // Define the path to the input schema
 const inputSchemaFile = 'schema/lif-schema.json';
@@ -49,11 +50,13 @@ async function generateCodeFromSchema(config: LanguageConfig): Promise<void> {
             "alphabetize-properties": "true",
             ...config.renderOptions,
         };
+        
+        const language = config.language == "csharp" ?  new OptionalAwareCSharpTargetLanguage() : config.language;
 
         // Generate code for the specified language
         const { lines } = await quicktype({
             inputData,
-            lang: config.language,
+            lang: language,
             rendererOptions,
         });
 
