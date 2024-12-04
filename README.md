@@ -53,7 +53,7 @@ Usage:
 ```typescript
 import { LIFParser } from 'vdma-lif';
 
-const layoutCollection = LIFParser.fromFile(sampleFile);
+const layoutCollection = LIFParser.fromJson(jsonString)
 ```
 
 ## Generate Models

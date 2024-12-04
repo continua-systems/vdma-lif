@@ -1,16 +1,9 @@
-import fs from "fs";
-import path from "path";
 import { expect } from "chai";
 import { describe, it } from "mocha";
 import { LIFParser } from "./";
 import { LIFLayoutCollection } from "./";
 
 describe("LIFParser", () => {
-  const sampleFile = path.resolve(
-    __dirname,
-    "../../../examples/example.lif.json",
-  );
-
   function assertLayoutCollection(layoutCollection: LIFLayoutCollection) {
     expect(layoutCollection).to.be.an("object");
 
@@ -85,36 +78,8 @@ describe("LIFParser", () => {
     expect(layout2.nodes[0].nodeId).to.equal("node-003");
   }
 
-  it("should parse a valid JSON file", () => {
-    const layoutCollection = LIFParser.fromFile(sampleFile);
-    expect(layoutCollection).to.not.be.null;
-    if (layoutCollection) assertLayoutCollection(layoutCollection);
-  });
-
   it("should throw an error for invalid JSON string", () => {
     const invalidJson = "{ invalid json }";
     expect(() => LIFParser.fromJson(invalidJson)).to.throw(SyntaxError);
-  });
-
-  it("should throw an error for a nonexistent file", () => {
-    const nonExistentFile = "nonexistent_file.json";
-    expect(() => LIFParser.fromFile(nonExistentFile)).to.throw(Error);
-  });
-
-  it("should write and read lif layouts to/from a file", () => {
-    const layoutCollection = LIFParser.fromFile(sampleFile);
-    expect(layoutCollection).to.not.be.null;
-
-    const tempFile = path.resolve(__dirname, "temp_lif.json");
-    if (layoutCollection) {
-      LIFParser.toFile(layoutCollection, tempFile);
-      const layoutCollectionFromFile = LIFParser.fromFile(tempFile);
-      expect(layoutCollectionFromFile).to.not.be.null;
-      if (layoutCollectionFromFile)
-        assertLayoutCollection(layoutCollectionFromFile);
-
-      // Cleanup
-      fs.unlinkSync(tempFile);
-    }
   });
 });

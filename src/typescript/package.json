@@ -1,6 +1,6 @@
 {
   "name": "vdma-lif",
-  "version": "1.0.0-4",
+  "version": "1.0.0-5",
   "description": "JSON parsers and models for the VDMA - LIF (Layout Interchange Format), which is used for defining track layouts and exchanging information between the integrator of driverless transport vehicles and a third-party master control system.",
   "main": "dist/index.js",
   "types": "index.d.ts",

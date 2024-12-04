@@ -12,26 +12,19 @@ npm install -D vdma-lif
 
 ## Usage
 
-### Read layouts from file
-```typescript
-import { LIFParser } from 'vdma-lif';
-
-const layoutCollection = LIFParser.fromFile(sampleFile);
-```
 
 ### Read layouts from string
 ```typescript
-const layoutCollection = LIFParser.fromJson(invalidJson)
+import { LIFParser } from 'vdma-lif';
+
+const layoutCollection = LIFParser.fromJson(jsonString)
 ```
 
 ### Convert into json
 ```typescript
-const jsonString = LIFParser.toJson(layoutCollection)
-```
+import { LIFParser } from 'vdma-lif';
 
-### Write layouts to file:
-```typescript
-LIFParser.toFile(layoutCollection, "example.lif.json")
+const jsonString = LIFParser.toJson(layoutCollection)
 ```
 
 ## License
