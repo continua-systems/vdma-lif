@@ -18,12 +18,14 @@ public partial class LifLayoutCollection
     ///     Collection of layouts used in the facility by the driverless transport system. All
     ///     layouts refer to the same global origin.
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("layouts")]
     public Layout[] Layouts { get; set; }
 
     /// <summary>
     ///     Contains metadata about the project and the LIF file.
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("metaInformation")]
     public MetaInformation MetaInformation { get; set; }
 }
@@ -33,6 +35,7 @@ public partial class Layout
     /// <summary>
     ///     List of edges in the layout. Edges represent paths between nodes.
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("edges")]
     public Edge[] Edges { get; set; }
 
@@ -46,6 +49,7 @@ public partial class Layout
     /// <summary>
     ///     Unique identifier for the layout.
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("layoutId")]
     public string LayoutId { get; set; }
 
@@ -67,22 +71,23 @@ public partial class Layout
     ///     Version number of the layout. It is suggested that this be an integer, represented as a
     ///     string, incremented with each change, starting at 1.
     /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonRequired]
     [JsonPropertyName("layoutVersion")]
-    public string? LayoutVersion { get; set; }
+    public string LayoutVersion { get; set; }
 
     /// <summary>
     ///     List of nodes in the layout. Nodes are locations where vehicles can navigate to.
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("nodes")]
     public Node[] Nodes { get; set; }
 
     /// <summary>
     ///     List of stations in the layout where vehicles perform specific actions.
     /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonRequired]
     [JsonPropertyName("stations")]
-    public Station[]? Stations { get; set; }
+    public Station[] Stations { get; set; }
 }
 
 public partial class Edge
@@ -90,24 +95,28 @@ public partial class Edge
     /// <summary>
     ///     Unique identifier for the edge.
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("edgeId")]
     public string EdgeId { get; set; }
 
     /// <summary>
     ///     ID of the ending node for this edge.
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("endNodeId")]
     public string EndNodeId { get; set; }
 
     /// <summary>
     ///     ID of the starting node for this edge.
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("startNodeId")]
     public string StartNodeId { get; set; }
 
     /// <summary>
     ///     Vehicle-specific properties for the edge.
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("vehicleTypeEdgeProperties")]
     public VehicleTypeEdgeProperty[] VehicleTypeEdgeProperties { get; set; }
 }
@@ -190,12 +199,14 @@ public partial class VehicleTypeEdgeProperty
     /// <summary>
     ///     Orientation of the vehicle while traversing the edge, in degrees. Range: [0.0 ... 360.0]
     /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("vehicleOrientation")]
-    public double VehicleOrientation { get; set; }
+    public double? VehicleOrientation { get; set; }
 
     /// <summary>
     ///     Identifier for the vehicle type.
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("vehicleTypeId")]
     public string VehicleTypeId { get; set; }
 }
@@ -208,9 +219,9 @@ public partial class LoadRestriction
     /// <summary>
     ///     Indicates if the edge can be traversed with a load.
     /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonRequired]
     [JsonPropertyName("loaded")]
-    public bool? Loaded { get; set; }
+    public bool Loaded { get; set; }
 
     /// <summary>
     ///     Names of the load sets allowed on this edge. *Optional*.
@@ -222,9 +233,9 @@ public partial class LoadRestriction
     /// <summary>
     ///     Indicates if the edge can be traversed without a load.
     /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonRequired]
     [JsonPropertyName("unloaded")]
-    public bool? Unloaded { get; set; }
+    public bool Unloaded { get; set; }
 }
 
 /// <summary>
@@ -233,11 +244,11 @@ public partial class LoadRestriction
 public partial class Trajectory
 {
     /// <summary>
-    ///     Control points defining the trajectory. *Optional*.
+    ///     Control points defining the trajectory.
     /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonRequired]
     [JsonPropertyName("controlPoints")]
-    public ControlPoint[]? ControlPoints { get; set; }
+    public ControlPoint[] ControlPoints { get; set; }
 
     /// <summary>
     ///     Degree of the trajectory curve. Default is 3. Range: [1 ... 3]
@@ -247,11 +258,11 @@ public partial class Trajectory
     public long? Degree { get; set; }
 
     /// <summary>
-    ///     Knot vector for the trajectory. *Optional*.
+    ///     Knot vector for the trajectory.
     /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonRequired]
     [JsonPropertyName("knotVector")]
-    public double[]? KnotVector { get; set; }
+    public double[] KnotVector { get; set; }
 }
 
 public partial class ControlPoint
@@ -267,12 +278,14 @@ public partial class ControlPoint
     /// <summary>
     ///     X coordinate of the control point in meters.
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("x")]
     public double X { get; set; }
 
     /// <summary>
     ///     Y coordinate of the control point in meters.
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("y")]
     public double Y { get; set; }
 }
@@ -296,6 +309,7 @@ public partial class Node
     /// <summary>
     ///     Unique identifier for the node.
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("nodeId")]
     public string NodeId { get; set; }
 
@@ -309,12 +323,14 @@ public partial class Node
     /// <summary>
     ///     Position of the node on the map (in meters).
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("nodePosition")]
     public NodePosition NodePosition { get; set; }
 
     /// <summary>
     ///     Vehicle-specific properties related to the node.
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("vehicleTypeNodeProperties")]
     public VehicleTypeNodeProperty[] VehicleTypeNodeProperties { get; set; }
 }
@@ -327,12 +343,14 @@ public partial class NodePosition
     /// <summary>
     ///     X coordinate of the node in meters. Range: [float64.min ... float64.max]
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("x")]
     public double X { get; set; }
 
     /// <summary>
     ///     Y coordinate of the node in meters. Range: [float64.min... float64.max]
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("y")]
     public double Y { get; set; }
 }
@@ -357,6 +375,7 @@ public partial class VehicleTypeNodeProperty
     /// <summary>
     ///     Identifier for the vehicle type.
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("vehicleTypeId")]
     public string VehicleTypeId { get; set; }
 }
@@ -380,16 +399,16 @@ public partial class Action
     /// <summary>
     ///     Type of action (e.g., move, load, unload).
     /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonRequired]
     [JsonPropertyName("actionType")]
-    public string? ActionType { get; set; }
+    public string ActionType { get; set; }
 
     /// <summary>
     ///     Specifies if the action is blocking (HARD or SOFT).
     /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonRequired]
     [JsonPropertyName("blockingType")]
-    public string? BlockingType { get; set; }
+    public string BlockingType { get; set; }
 
     /// <summary>
     ///     Whether the action is mandatory.
@@ -404,16 +423,16 @@ public partial class ActionParameter
     /// <summary>
     ///     Key of the action parameter.
     /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonRequired]
     [JsonPropertyName("key")]
-    public string? Key { get; set; }
+    public string Key { get; set; }
 
     /// <summary>
     ///     Value of the action parameter.
     /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonRequired]
     [JsonPropertyName("value")]
-    public string? Value { get; set; }
+    public string Value { get; set; }
 }
 
 public partial class Station
@@ -421,6 +440,7 @@ public partial class Station
     /// <summary>
     ///     List of node IDs where the station interacts.
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("interactionNodeIds")]
     public string[] InteractionNodeIds { get; set; }
 
@@ -441,6 +461,7 @@ public partial class Station
     /// <summary>
     ///     Unique identifier for the station.
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("stationId")]
     public string StationId { get; set; }
 
@@ -454,8 +475,9 @@ public partial class Station
     /// <summary>
     ///     Position of the station on the map (in meters).
     /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("stationPosition")]
-    public StationPosition StationPosition { get; set; }
+    public StationPosition? StationPosition { get; set; }
 }
 
 /// <summary>
@@ -473,12 +495,14 @@ public partial class StationPosition
     /// <summary>
     ///     X coordinate of the station in meters. Range: [float64.min ... float64.max]
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("x")]
     public double X { get; set; }
 
     /// <summary>
     ///     Y coordinate of the station in meters. Range: [float64.min ... float64.max]
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("y")]
     public double Y { get; set; }
 }
@@ -491,6 +515,7 @@ public partial class MetaInformation
     /// <summary>
     ///     Creator of the LIF file (e.g., name of company or person).
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("creator")]
     public string Creator { get; set; }
 
@@ -498,18 +523,21 @@ public partial class MetaInformation
     ///     The timestamp at which this LIF file was created/updated/modified. Format is ISO8601 in
     ///     UTC.
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("exportTimestamp")]
     public DateTimeOffset ExportTimestamp { get; set; }
 
     /// <summary>
     ///     Version of the LIF file format. Follows semantic versioning (Major.Minor.Patch).
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("lifVersion")]
     public string LifVersion { get; set; }
 
     /// <summary>
     ///     Human-readable name of the project (e.g., for display purposes).
     /// </summary>
+    [JsonRequired]
     [JsonPropertyName("projectIdentification")]
     public string ProjectIdentification { get; set; }
 }

@@ -1,6 +1,6 @@
 
 from dataclasses import dataclass
-from typing import Optional, List, Any, TypeVar, Callable, Type, cast
+from typing import List, Optional, Any, TypeVar, Callable, Type, cast
 from datetime import datetime
 import dateutil.parser
 
@@ -10,6 +10,16 @@ T = TypeVar("T")
 
 def from_bool(x: Any) -> bool:
     assert isinstance(x, bool)
+    return x
+
+
+def from_list(f: Callable[[Any], T], x: Any) -> List[T]:
+    assert isinstance(x, list)
+    return [f(y) for y in x]
+
+
+def from_str(x: Any) -> str:
+    assert isinstance(x, str)
     return x
 
 
@@ -25,16 +35,6 @@ def from_union(fs, x):
         except BaseException:
             pass
     assert False
-
-
-def from_list(f: Callable[[Any], T], x: Any) -> List[T]:
-    assert isinstance(x, list)
-    return [f(y) for y in x]
-
-
-def from_str(x: Any) -> str:
-    assert isinstance(x, str)
-    return x
 
 
 def from_float(x: Any) -> float:
@@ -65,31 +65,29 @@ def from_datetime(x: Any) -> datetime:
 class LoadRestriction:
     """Load restrictions for this edge. *Optional*."""
 
-    loaded: Optional[bool] = None
+    loaded: bool
     """Indicates if the edge can be traversed with a load."""
+
+    unloaded: bool
+    """Indicates if the edge can be traversed without a load."""
 
     load_set_names: Optional[List[str]] = None
     """Names of the load sets allowed on this edge. *Optional*."""
 
-    unloaded: Optional[bool] = None
-    """Indicates if the edge can be traversed without a load."""
-
     @staticmethod
     def from_dict(obj: Any) -> 'LoadRestriction':
         assert isinstance(obj, dict)
-        loaded = from_union([from_bool, from_none], obj.get("loaded"))
+        loaded = from_bool(obj.get("loaded"))
+        unloaded = from_bool(obj.get("unloaded"))
         load_set_names = from_union([lambda x: from_list(from_str, x), from_none], obj.get("loadSetNames"))
-        unloaded = from_union([from_bool, from_none], obj.get("unloaded"))
-        return LoadRestriction(loaded, load_set_names, unloaded)
+        return LoadRestriction(loaded, unloaded, load_set_names)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        if self.loaded is not None:
-            result["loaded"] = from_union([from_bool, from_none], self.loaded)
+        result["loaded"] = from_bool(self.loaded)
+        result["unloaded"] = from_bool(self.unloaded)
         if self.load_set_names is not None:
             result["loadSetNames"] = from_union([lambda x: from_list(from_str, x), from_none], self.load_set_names)
-        if self.unloaded is not None:
-            result["unloaded"] = from_union([from_bool, from_none], self.unloaded)
         return result
 
 
@@ -127,41 +125,34 @@ class ControlPoint:
 class Trajectory:
     """Trajectory information for this edge, if applicable. *Optional*."""
 
-    control_points: Optional[List[ControlPoint]] = None
-    """Control points defining the trajectory. *Optional*."""
+    control_points: List[ControlPoint]
+    """Control points defining the trajectory."""
+
+    knot_vector: List[float]
+    """Knot vector for the trajectory."""
 
     degree: Optional[int] = None
     """Degree of the trajectory curve. Default is 3. Range: [1 ... 3]"""
 
-    knot_vector: Optional[List[float]] = None
-    """Knot vector for the trajectory. *Optional*."""
-
     @staticmethod
     def from_dict(obj: Any) -> 'Trajectory':
         assert isinstance(obj, dict)
-        control_points = from_union([lambda x: from_list(ControlPoint.from_dict, x),
-                                    from_none], obj.get("controlPoints"))
+        control_points = from_list(ControlPoint.from_dict, obj.get("controlPoints"))
+        knot_vector = from_list(from_float, obj.get("knotVector"))
         degree = from_union([from_int, from_none], obj.get("degree"))
-        knot_vector = from_union([lambda x: from_list(from_float, x), from_none], obj.get("knotVector"))
-        return Trajectory(control_points, degree, knot_vector)
+        return Trajectory(control_points, knot_vector, degree)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        if self.control_points is not None:
-            result["controlPoints"] = from_union([lambda x: from_list(
-                lambda x: to_class(ControlPoint, x), x), from_none], self.control_points)
+        result["controlPoints"] = from_list(lambda x: to_class(ControlPoint, x), self.control_points)
+        result["knotVector"] = from_list(to_float, self.knot_vector)
         if self.degree is not None:
             result["degree"] = from_union([from_int, from_none], self.degree)
-        if self.knot_vector is not None:
-            result["knotVector"] = from_union([lambda x: from_list(to_float, x), from_none], self.knot_vector)
         return result
 
 
 @dataclass
 class VehicleTypeEdgeProperty:
-    vehicle_orientation: float
-    """Orientation of the vehicle while traversing the edge, in degrees. Range: [0.0 ... 360.0]"""
-
     vehicle_type_id: str
     """Identifier for the vehicle type."""
 
@@ -198,10 +189,12 @@ class VehicleTypeEdgeProperty:
     trajectory: Optional[Trajectory] = None
     """Trajectory information for this edge, if applicable. *Optional*."""
 
+    vehicle_orientation: Optional[float] = None
+    """Orientation of the vehicle while traversing the edge, in degrees. Range: [0.0 ... 360.0]"""
+
     @staticmethod
     def from_dict(obj: Any) -> 'VehicleTypeEdgeProperty':
         assert isinstance(obj, dict)
-        vehicle_orientation = from_float(obj.get("vehicleOrientation"))
         vehicle_type_id = from_str(obj.get("vehicleTypeId"))
         load_restriction = from_union([LoadRestriction.from_dict, from_none], obj.get("loadRestriction"))
         max_height = from_union([from_float, from_none], obj.get("maxHeight"))
@@ -213,12 +206,12 @@ class VehicleTypeEdgeProperty:
         rotation_at_end_node_allowed = from_union([from_str, from_none], obj.get("rotationAtEndNodeAllowed"))
         rotation_at_start_node_allowed = from_union([from_str, from_none], obj.get("rotationAtStartNodeAllowed"))
         trajectory = from_union([Trajectory.from_dict, from_none], obj.get("trajectory"))
-        return VehicleTypeEdgeProperty(vehicle_orientation, vehicle_type_id, load_restriction, max_height, max_rotation_speed, max_speed,
-                                       min_height, orientation_type, rotation_allowed, rotation_at_end_node_allowed, rotation_at_start_node_allowed, trajectory)
+        vehicle_orientation = from_union([from_float, from_none], obj.get("vehicleOrientation"))
+        return VehicleTypeEdgeProperty(vehicle_type_id, load_restriction, max_height, max_rotation_speed, max_speed, min_height, orientation_type,
+                                       rotation_allowed, rotation_at_end_node_allowed, rotation_at_start_node_allowed, trajectory, vehicle_orientation)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["vehicleOrientation"] = to_float(self.vehicle_orientation)
         result["vehicleTypeId"] = from_str(self.vehicle_type_id)
         if self.load_restriction is not None:
             result["loadRestriction"] = from_union(
@@ -242,6 +235,8 @@ class VehicleTypeEdgeProperty:
                 [from_str, from_none], self.rotation_at_start_node_allowed)
         if self.trajectory is not None:
             result["trajectory"] = from_union([lambda x: to_class(Trajectory, x), from_none], self.trajectory)
+        if self.vehicle_orientation is not None:
+            result["vehicleOrientation"] = from_union([to_float, from_none], self.vehicle_orientation)
         return result
 
 
@@ -306,41 +301,39 @@ class NodePosition:
 
 @dataclass
 class ActionParameter:
-    key: Optional[str] = None
+    key: str
     """Key of the action parameter."""
 
-    value: Optional[str] = None
+    value: str
     """Value of the action parameter."""
 
     @staticmethod
     def from_dict(obj: Any) -> 'ActionParameter':
         assert isinstance(obj, dict)
-        key = from_union([from_str, from_none], obj.get("key"))
-        value = from_union([from_str, from_none], obj.get("value"))
+        key = from_str(obj.get("key"))
+        value = from_str(obj.get("value"))
         return ActionParameter(key, value)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        if self.key is not None:
-            result["key"] = from_union([from_str, from_none], self.key)
-        if self.value is not None:
-            result["value"] = from_union([from_str, from_none], self.value)
+        result["key"] = from_str(self.key)
+        result["value"] = from_str(self.value)
         return result
 
 
 @dataclass
 class Action:
+    action_type: str
+    """Type of action (e.g., move, load, unload)."""
+
+    blocking_type: str
+    """Specifies if the action is blocking (HARD or SOFT)."""
+
     action_description: Optional[str] = None
     """Description of the action. *Optional*."""
 
     action_parameters: Optional[List[ActionParameter]] = None
     """Parameters associated with the action. *Optional*."""
-
-    action_type: Optional[str] = None
-    """Type of action (e.g., move, load, unload)."""
-
-    blocking_type: Optional[str] = None
-    """Specifies if the action is blocking (HARD or SOFT)."""
 
     required: Optional[bool] = None
     """Whether the action is mandatory."""
@@ -348,25 +341,23 @@ class Action:
     @staticmethod
     def from_dict(obj: Any) -> 'Action':
         assert isinstance(obj, dict)
+        action_type = from_str(obj.get("actionType"))
+        blocking_type = from_str(obj.get("blockingType"))
         action_description = from_union([from_str, from_none], obj.get("actionDescription"))
         action_parameters = from_union([lambda x: from_list(ActionParameter.from_dict, x),
                                        from_none], obj.get("actionParameters"))
-        action_type = from_union([from_str, from_none], obj.get("actionType"))
-        blocking_type = from_union([from_str, from_none], obj.get("blockingType"))
         required = from_union([from_bool, from_none], obj.get("required"))
-        return Action(action_description, action_parameters, action_type, blocking_type, required)
+        return Action(action_type, blocking_type, action_description, action_parameters, required)
 
     def to_dict(self) -> dict:
         result: dict = {}
+        result["actionType"] = from_str(self.action_type)
+        result["blockingType"] = from_str(self.blocking_type)
         if self.action_description is not None:
             result["actionDescription"] = from_union([from_str, from_none], self.action_description)
         if self.action_parameters is not None:
             result["actionParameters"] = from_union([lambda x: from_list(
                 lambda x: to_class(ActionParameter, x), x), from_none], self.action_parameters)
-        if self.action_type is not None:
-            result["actionType"] = from_union([from_str, from_none], self.action_type)
-        if self.blocking_type is not None:
-            result["blockingType"] = from_union([from_str, from_none], self.blocking_type)
         if self.required is not None:
             result["required"] = from_union([from_bool, from_none], self.required)
         return result
@@ -490,9 +481,6 @@ class Station:
     station_id: str
     """Unique identifier for the station."""
 
-    station_position: StationPosition
-    """Position of the station on the map (in meters)."""
-
     station_description: Optional[str] = None
     """Description of the station. *Optional*."""
 
@@ -502,29 +490,34 @@ class Station:
     station_name: Optional[str] = None
     """Name of the station. *Optional*."""
 
+    station_position: Optional[StationPosition] = None
+    """Position of the station on the map (in meters)."""
+
     @staticmethod
     def from_dict(obj: Any) -> 'Station':
         assert isinstance(obj, dict)
         interaction_node_ids = from_list(from_str, obj.get("interactionNodeIds"))
         station_id = from_str(obj.get("stationId"))
-        station_position = StationPosition.from_dict(obj.get("stationPosition"))
         station_description = from_union([from_str, from_none], obj.get("stationDescription"))
         station_height = from_union([from_float, from_none], obj.get("stationHeight"))
         station_name = from_union([from_str, from_none], obj.get("stationName"))
-        return Station(interaction_node_ids, station_id, station_position,
-                       station_description, station_height, station_name)
+        station_position = from_union([StationPosition.from_dict, from_none], obj.get("stationPosition"))
+        return Station(interaction_node_ids, station_id, station_description,
+                       station_height, station_name, station_position)
 
     def to_dict(self) -> dict:
         result: dict = {}
         result["interactionNodeIds"] = from_list(from_str, self.interaction_node_ids)
         result["stationId"] = from_str(self.station_id)
-        result["stationPosition"] = to_class(StationPosition, self.station_position)
         if self.station_description is not None:
             result["stationDescription"] = from_union([from_str, from_none], self.station_description)
         if self.station_height is not None:
             result["stationHeight"] = from_union([to_float, from_none], self.station_height)
         if self.station_name is not None:
             result["stationName"] = from_union([from_str, from_none], self.station_name)
+        if self.station_position is not None:
+            result["stationPosition"] = from_union(
+                [lambda x: to_class(StationPosition, x), from_none], self.station_position)
         return result
 
 
@@ -536,8 +529,15 @@ class Layout:
     layout_id: str
     """Unique identifier for the layout."""
 
+    layout_version: str
+    """Version number of the layout. It is suggested that this be an integer, represented as a
+    string, incremented with each change, starting at 1.
+    """
     nodes: List[Node]
     """List of nodes in the layout. Nodes are locations where vehicles can navigate to."""
+
+    stations: List[Station]
+    """List of stations in the layout where vehicles perform specific actions."""
 
     layout_description: Optional[str] = None
     """Description of the layout. *Optional*."""
@@ -548,43 +548,33 @@ class Layout:
     layout_name: Optional[str] = None
     """Name of the layout."""
 
-    layout_version: Optional[str] = None
-    """Version number of the layout. It is suggested that this be an integer, represented as a
-    string, incremented with each change, starting at 1.
-    """
-    stations: Optional[List[Station]] = None
-    """List of stations in the layout where vehicles perform specific actions."""
-
     @staticmethod
     def from_dict(obj: Any) -> 'Layout':
         assert isinstance(obj, dict)
         edges = from_list(Edge.from_dict, obj.get("edges"))
         layout_id = from_str(obj.get("layoutId"))
+        layout_version = from_str(obj.get("layoutVersion"))
         nodes = from_list(Node.from_dict, obj.get("nodes"))
+        stations = from_list(Station.from_dict, obj.get("stations"))
         layout_description = from_union([from_str, from_none], obj.get("layoutDescription"))
         layout_level_id = from_union([from_str, from_none], obj.get("layoutLevelId"))
         layout_name = from_union([from_str, from_none], obj.get("layoutName"))
-        layout_version = from_union([from_str, from_none], obj.get("layoutVersion"))
-        stations = from_union([lambda x: from_list(Station.from_dict, x), from_none], obj.get("stations"))
-        return Layout(edges, layout_id, nodes, layout_description,
-                      layout_level_id, layout_name, layout_version, stations)
+        return Layout(edges, layout_id, layout_version, nodes, stations,
+                      layout_description, layout_level_id, layout_name)
 
     def to_dict(self) -> dict:
         result: dict = {}
         result["edges"] = from_list(lambda x: to_class(Edge, x), self.edges)
         result["layoutId"] = from_str(self.layout_id)
+        result["layoutVersion"] = from_str(self.layout_version)
         result["nodes"] = from_list(lambda x: to_class(Node, x), self.nodes)
+        result["stations"] = from_list(lambda x: to_class(Station, x), self.stations)
         if self.layout_description is not None:
             result["layoutDescription"] = from_union([from_str, from_none], self.layout_description)
         if self.layout_level_id is not None:
             result["layoutLevelId"] = from_union([from_str, from_none], self.layout_level_id)
         if self.layout_name is not None:
             result["layoutName"] = from_union([from_str, from_none], self.layout_name)
-        if self.layout_version is not None:
-            result["layoutVersion"] = from_union([from_str, from_none], self.layout_version)
-        if self.stations is not None:
-            result["stations"] = from_union([lambda x: from_list(
-                lambda x: to_class(Station, x), x), from_none], self.stations)
         return result
 
 

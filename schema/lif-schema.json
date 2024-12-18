@@ -148,10 +148,18 @@
                                                                         "type": "string",
                                                                         "description": "Value of the action parameter."
                                                                     }
-                                                                }
+                                                                },
+                                                                "required": [
+                                                                    "key",
+                                                                    "value"
+                                                                ]
                                                             }
                                                         }
-                                                    }
+                                                    },
+                                                    "required": [
+                                                        "actionType",
+                                                        "blockingType"
+                                                    ]
                                                 }
                                             }
                                         },
@@ -251,7 +259,11 @@
                                                             "type": "string"
                                                         }
                                                     }
-                                                }
+                                                },
+                                                "required": [
+                                                    "unloaded",
+                                                    "loaded"
+                                                ]
                                             },
                                             "trajectory": {
                                                 "type": "object",
@@ -264,14 +276,14 @@
                                                     },
                                                     "knotVector": {
                                                         "type": "array",
-                                                        "description": "Knot vector for the trajectory. *Optional*.",
+                                                        "description": "Knot vector for the trajectory.",
                                                         "items": {
                                                             "type": "number"
                                                         }
                                                     },
                                                     "controlPoints": {
                                                         "type": "array",
-                                                        "description": "Control points defining the trajectory. *Optional*.",
+                                                        "description": "Control points defining the trajectory.",
                                                         "items": {
                                                             "type": "object",
                                                             "properties": {
@@ -295,12 +307,15 @@
                                                             ]
                                                         }
                                                     }
-                                                }
+                                                },
+                                                "required": [
+                                                    "knotVector",
+                                                    "controlPoints"
+                                                ]
                                             }
                                         },
                                         "required": [
-                                            "vehicleTypeId",
-                                            "vehicleOrientation"
+                                            "vehicleTypeId"
                                         ]
                                     }
                                 }
@@ -367,16 +382,17 @@
                             },
                             "required": [
                                 "stationId",
-                                "interactionNodeIds",
-                                "stationPosition"
+                                "interactionNodeIds"
                             ]
                         }
                     }
                 },
                 "required": [
                     "layoutId",
+                    "layoutVersion",
                     "nodes",
-                    "edges"
+                    "edges",
+                    "stations"
                 ]
             }
         }

@@ -45,7 +45,7 @@ export interface Layout {
    * Version number of the layout. It is suggested that this be an integer, represented as a
    * string, incremented with each change, starting at 1.
    */
-  layoutVersion?: string;
+  layoutVersion: string;
   /**
    * List of nodes in the layout. Nodes are locations where vehicles can navigate to.
    */
@@ -53,7 +53,7 @@ export interface Layout {
   /**
    * List of stations in the layout where vehicles perform specific actions.
    */
-  stations?: Station[];
+  stations: Station[];
   [property: string]: any;
 }
 
@@ -124,7 +124,7 @@ export interface VehicleTypeEdgeProperty {
   /**
    * Orientation of the vehicle while traversing the edge, in degrees. Range: [0.0 ... 360.0]
    */
-  vehicleOrientation: number;
+  vehicleOrientation?: number;
   /**
    * Identifier for the vehicle type.
    */
@@ -139,7 +139,7 @@ export interface LoadRestriction {
   /**
    * Indicates if the edge can be traversed with a load.
    */
-  loaded?: boolean;
+  loaded: boolean;
   /**
    * Names of the load sets allowed on this edge. *Optional*.
    */
@@ -147,7 +147,7 @@ export interface LoadRestriction {
   /**
    * Indicates if the edge can be traversed without a load.
    */
-  unloaded?: boolean;
+  unloaded: boolean;
   [property: string]: any;
 }
 
@@ -156,17 +156,17 @@ export interface LoadRestriction {
  */
 export interface Trajectory {
   /**
-   * Control points defining the trajectory. *Optional*.
+   * Control points defining the trajectory.
    */
-  controlPoints?: ControlPoint[];
+  controlPoints: ControlPoint[];
   /**
    * Degree of the trajectory curve. Default is 3. Range: [1 ... 3]
    */
   degree?: number;
   /**
-   * Knot vector for the trajectory. *Optional*.
+   * Knot vector for the trajectory.
    */
-  knotVector?: number[];
+  knotVector: number[];
   [property: string]: any;
 }
 
@@ -259,11 +259,11 @@ export interface Action {
   /**
    * Type of action (e.g., move, load, unload).
    */
-  actionType?: string;
+  actionType: string;
   /**
    * Specifies if the action is blocking (HARD or SOFT).
    */
-  blockingType?: string;
+  blockingType: string;
   /**
    * Whether the action is mandatory.
    */
@@ -275,11 +275,11 @@ export interface ActionParameter {
   /**
    * Key of the action parameter.
    */
-  key?: string;
+  key: string;
   /**
    * Value of the action parameter.
    */
-  value?: string;
+  value: string;
   [property: string]: any;
 }
 
@@ -307,7 +307,7 @@ export interface Station {
   /**
    * Position of the station on the map (in meters).
    */
-  stationPosition: StationPosition;
+  stationPosition?: StationPosition;
   [property: string]: any;
 }
 
@@ -569,9 +569,9 @@ const typeMap: any = {
       { json: "layoutId", js: "layoutId", typ: "" },
       { json: "layoutLevelId", js: "layoutLevelId", typ: u(undefined, "") },
       { json: "layoutName", js: "layoutName", typ: u(undefined, "") },
-      { json: "layoutVersion", js: "layoutVersion", typ: u(undefined, "") },
+      { json: "layoutVersion", js: "layoutVersion", typ: "" },
       { json: "nodes", js: "nodes", typ: a(r("Node")) },
-      { json: "stations", js: "stations", typ: u(undefined, a(r("Station"))) },
+      { json: "stations", js: "stations", typ: a(r("Station")) },
     ],
     "any",
   ),
@@ -624,28 +624,28 @@ const typeMap: any = {
         js: "trajectory",
         typ: u(undefined, r("Trajectory")),
       },
-      { json: "vehicleOrientation", js: "vehicleOrientation", typ: 3.14 },
+      {
+        json: "vehicleOrientation",
+        js: "vehicleOrientation",
+        typ: u(undefined, 3.14),
+      },
       { json: "vehicleTypeId", js: "vehicleTypeId", typ: "" },
     ],
     "any",
   ),
   LoadRestriction: o(
     [
-      { json: "loaded", js: "loaded", typ: u(undefined, true) },
+      { json: "loaded", js: "loaded", typ: true },
       { json: "loadSetNames", js: "loadSetNames", typ: u(undefined, a("")) },
-      { json: "unloaded", js: "unloaded", typ: u(undefined, true) },
+      { json: "unloaded", js: "unloaded", typ: true },
     ],
     "any",
   ),
   Trajectory: o(
     [
-      {
-        json: "controlPoints",
-        js: "controlPoints",
-        typ: u(undefined, a(r("ControlPoint"))),
-      },
+      { json: "controlPoints", js: "controlPoints", typ: a(r("ControlPoint")) },
       { json: "degree", js: "degree", typ: u(undefined, 0) },
-      { json: "knotVector", js: "knotVector", typ: u(undefined, a(3.14)) },
+      { json: "knotVector", js: "knotVector", typ: a(3.14) },
     ],
     "any",
   ),
@@ -699,16 +699,16 @@ const typeMap: any = {
         js: "actionParameters",
         typ: u(undefined, a(r("ActionParameter"))),
       },
-      { json: "actionType", js: "actionType", typ: u(undefined, "") },
-      { json: "blockingType", js: "blockingType", typ: u(undefined, "") },
+      { json: "actionType", js: "actionType", typ: "" },
+      { json: "blockingType", js: "blockingType", typ: "" },
       { json: "required", js: "required", typ: u(undefined, true) },
     ],
     "any",
   ),
   ActionParameter: o(
     [
-      { json: "key", js: "key", typ: u(undefined, "") },
-      { json: "value", js: "value", typ: u(undefined, "") },
+      { json: "key", js: "key", typ: "" },
+      { json: "value", js: "value", typ: "" },
     ],
     "any",
   ),
@@ -726,7 +726,7 @@ const typeMap: any = {
       {
         json: "stationPosition",
         js: "stationPosition",
-        typ: r("StationPosition"),
+        typ: u(undefined, r("StationPosition")),
       },
     ],
     "any",
