@@ -126,13 +126,15 @@
                                                             "type": "string",
                                                             "description": "Description of the action. *Optional*."
                                                         },
-                                                        "required": {
-                                                            "type": "boolean",
-                                                            "description": "Whether the action is mandatory."
+                                                        "requirementType": {
+                                                            "type": "string",
+                                                            "enum": ["REQUIRED", "CONDITIONAL", "OPTIONAL"],
+                                                            "description": "Defines if the action is required. REQUIRED: The (third-party) master control system must always communicate this action. CONDITIONAL: The action may or may not be required contingent upon various factors. OPTIONAL: The action may or may not be communicated at the master control system's discretion."
                                                         },
                                                         "blockingType": {
                                                             "type": "string",
-                                                            "description": "Specifies if the action is blocking (HARD or SOFT)."
+                                                            "enum": ["NONE", "SOFT", "HARD"],
+                                                            "description": "Specifies if the action is blocking. NONE: allows moving and other actions. SOFT: allows other actions, but not moving. HARD: is the only allowed action at this time."
                                                         },
                                                         "actionParameters": {
                                                             "type": "array",
@@ -312,6 +314,62 @@
                                                     "knotVector",
                                                     "controlPoints"
                                                 ]
+                                            },
+                                            "actions": {
+                                                "type": "array",
+                                                "description": "Actions that can be integrated into the order by the (third-party) master control system each time any vehicle with the corresponding vehicleTypeId is sent an order/order update that contains this edge. *Optional*.",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "actionType": {
+                                                            "type": "string",
+                                                            "description": "Type of action (e.g., move, load, unload)."
+                                                        },
+                                                        "actionDescription": {
+                                                            "type": "string",
+                                                            "description": "Description of the action. *Optional*."
+                                                        },
+                                                        "requirementType": {
+                                                            "type": "string",
+                                                            "enum": ["REQUIRED", "CONDITIONAL", "OPTIONAL"],
+                                                            "description": "Defines if the action is required. REQUIRED: The (third-party) master control system must always communicate this action. CONDITIONAL: The action may or may not be required contingent upon various factors. OPTIONAL: The action may or may not be communicated at the master control system's discretion."
+                                                        },
+                                                        "blockingType": {
+                                                            "type": "string",
+                                                            "enum": ["NONE", "SOFT", "HARD"],
+                                                            "description": "Specifies if the action is blocking. NONE: allows moving and other actions. SOFT: allows other actions, but not moving. HARD: is the only allowed action at this time."
+                                                        },
+                                                        "actionParameters": {
+                                                            "type": "array",
+                                                            "description": "Parameters associated with the action. *Optional*.",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "key": {
+                                                                        "type": "string",
+                                                                        "description": "Key of the action parameter."
+                                                                    },
+                                                                    "value": {
+                                                                        "type": "string",
+                                                                        "description": "Value of the action parameter."
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "key",
+                                                                    "value"
+                                                                ]
+                                                            }
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "actionType",
+                                                        "blockingType"
+                                                    ]
+                                                }
+                                            },
+                                            "reentryAllowed": {
+                                                "type": "boolean",
+                                                "description": "true: Vehicles of the corresponding vehicleTypeId are allowed to enter into automatic management by the (third-party) master control system while on this edge. false: Vehicles are not allowed to enter into automatic management while on this edge. Default is true if not defined."
                                             }
                                         },
                                         "required": [

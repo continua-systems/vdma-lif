@@ -92,8 +92,8 @@ public class LifLayoutsTests
         var action1 = vehicleType1.Actions[0];
         Assert.Equal("move", action1.ActionType);
         Assert.Equal("Move forward", action1.ActionDescription);
-        Assert.True(action1.ActionRequired);
-        Assert.Equal("HARD", action1.BlockingType);
+        Assert.Equal(RequirementType.Required, action1.RequirementType);
+        Assert.Equal(BlockingType.Hard, action1.BlockingType);
         Assert.Equal(2, action1.ActionParameters?.Length);
         Assert.Equal("speed", action1.ActionParameters?[0].Key);
         Assert.Equal("fast", action1.ActionParameters?[0].Value);

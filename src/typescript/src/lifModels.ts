@@ -79,6 +79,12 @@ export interface Edge {
 
 export interface VehicleTypeEdgeProperty {
   /**
+   * Actions that can be integrated into the order by the (third-party) master control system
+   * each time any vehicle with the corresponding vehicleTypeId is sent an order/order update
+   * that contains this edge. *Optional*.
+   */
+  actions?: VehicleTypeEdgePropertyAction[];
+  /**
    * Load restrictions for this edge. *Optional*.
    */
   loadRestriction?: LoadRestriction;
@@ -106,6 +112,13 @@ export interface VehicleTypeEdgeProperty {
    */
   orientationType?: string;
   /**
+   * true: Vehicles of the corresponding vehicleTypeId are allowed to enter into automatic
+   * management by the (third-party) master control system while on this edge. false: Vehicles
+   * are not allowed to enter into automatic management while on this edge. Default is true if
+   * not defined.
+   */
+  reentryAllowed?: boolean;
+  /**
    * Indicates if rotation is allowed while on the edge. *Optional*.
    */
   rotationAllowed?: boolean;
@@ -130,6 +143,68 @@ export interface VehicleTypeEdgeProperty {
    */
   vehicleTypeId: string;
   [property: string]: any;
+}
+
+export interface VehicleTypeEdgePropertyAction {
+  /**
+   * Description of the action. *Optional*.
+   */
+  actionDescription?: string;
+  /**
+   * Parameters associated with the action. *Optional*.
+   */
+  actionParameters?: PurpleActionParameter[];
+  /**
+   * Type of action (e.g., move, load, unload).
+   */
+  actionType: string;
+  /**
+   * Specifies if the action is blocking. NONE: allows moving and other actions. SOFT: allows
+   * other actions, but not moving. HARD: is the only allowed action at this time.
+   */
+  blockingType: BlockingType;
+  /**
+   * Defines if the action is required. REQUIRED: The (third-party) master control system must
+   * always communicate this action. CONDITIONAL: The action may or may not be required
+   * contingent upon various factors. OPTIONAL: The action may or may not be communicated at
+   * the master control system's discretion.
+   */
+  requirementType?: RequirementType;
+  [property: string]: any;
+}
+
+export interface PurpleActionParameter {
+  /**
+   * Key of the action parameter.
+   */
+  key: string;
+  /**
+   * Value of the action parameter.
+   */
+  value: string;
+  [property: string]: any;
+}
+
+/**
+ * Specifies if the action is blocking. NONE: allows moving and other actions. SOFT: allows
+ * other actions, but not moving. HARD: is the only allowed action at this time.
+ */
+export enum BlockingType {
+  Hard = "HARD",
+  None = "NONE",
+  Soft = "SOFT",
+}
+
+/**
+ * Defines if the action is required. REQUIRED: The (third-party) master control system must
+ * always communicate this action. CONDITIONAL: The action may or may not be required
+ * contingent upon various factors. OPTIONAL: The action may or may not be communicated at
+ * the master control system's discretion.
+ */
+export enum RequirementType {
+  Conditional = "CONDITIONAL",
+  Optional = "OPTIONAL",
+  Required = "REQUIRED",
 }
 
 /**
@@ -234,7 +309,7 @@ export interface VehicleTypeNodeProperty {
   /**
    * List of actions that the vehicle can perform at the node. *Optional*.
    */
-  actions?: Action[];
+  actions?: VehicleTypeNodePropertyAction[];
   /**
    * Absolute orientation of the vehicle on the node in reference to the global origin’s
    * rotation. Range: [-Pi ... Pi]
@@ -247,7 +322,7 @@ export interface VehicleTypeNodeProperty {
   [property: string]: any;
 }
 
-export interface Action {
+export interface VehicleTypeNodePropertyAction {
   /**
    * Description of the action. *Optional*.
    */
@@ -255,23 +330,27 @@ export interface Action {
   /**
    * Parameters associated with the action. *Optional*.
    */
-  actionParameters?: ActionParameter[];
+  actionParameters?: FluffyActionParameter[];
   /**
    * Type of action (e.g., move, load, unload).
    */
   actionType: string;
   /**
-   * Specifies if the action is blocking (HARD or SOFT).
+   * Specifies if the action is blocking. NONE: allows moving and other actions. SOFT: allows
+   * other actions, but not moving. HARD: is the only allowed action at this time.
    */
-  blockingType: string;
+  blockingType: BlockingType;
   /**
-   * Whether the action is mandatory.
+   * Defines if the action is required. REQUIRED: The (third-party) master control system must
+   * always communicate this action. CONDITIONAL: The action may or may not be required
+   * contingent upon various factors. OPTIONAL: The action may or may not be communicated at
+   * the master control system's discretion.
    */
-  required?: boolean;
+  requirementType?: RequirementType;
   [property: string]: any;
 }
 
-export interface ActionParameter {
+export interface FluffyActionParameter {
   /**
    * Key of the action parameter.
    */
@@ -591,6 +670,11 @@ const typeMap: any = {
   VehicleTypeEdgeProperty: o(
     [
       {
+        json: "actions",
+        js: "actions",
+        typ: u(undefined, a(r("VehicleTypeEdgePropertyAction"))),
+      },
+      {
         json: "loadRestriction",
         js: "loadRestriction",
         typ: u(undefined, r("LoadRestriction")),
@@ -604,6 +688,7 @@ const typeMap: any = {
       { json: "maxSpeed", js: "maxSpeed", typ: u(undefined, 3.14) },
       { json: "minHeight", js: "minHeight", typ: u(undefined, 3.14) },
       { json: "orientationType", js: "orientationType", typ: u(undefined, "") },
+      { json: "reentryAllowed", js: "reentryAllowed", typ: u(undefined, true) },
       {
         json: "rotationAllowed",
         js: "rotationAllowed",
@@ -630,6 +715,35 @@ const typeMap: any = {
         typ: u(undefined, 3.14),
       },
       { json: "vehicleTypeId", js: "vehicleTypeId", typ: "" },
+    ],
+    "any",
+  ),
+  VehicleTypeEdgePropertyAction: o(
+    [
+      {
+        json: "actionDescription",
+        js: "actionDescription",
+        typ: u(undefined, ""),
+      },
+      {
+        json: "actionParameters",
+        js: "actionParameters",
+        typ: u(undefined, a(r("PurpleActionParameter"))),
+      },
+      { json: "actionType", js: "actionType", typ: "" },
+      { json: "blockingType", js: "blockingType", typ: r("BlockingType") },
+      {
+        json: "requirementType",
+        js: "requirementType",
+        typ: u(undefined, r("RequirementType")),
+      },
+    ],
+    "any",
+  ),
+  PurpleActionParameter: o(
+    [
+      { json: "key", js: "key", typ: "" },
+      { json: "value", js: "value", typ: "" },
     ],
     "any",
   ),
@@ -681,13 +795,17 @@ const typeMap: any = {
   ),
   VehicleTypeNodeProperty: o(
     [
-      { json: "actions", js: "actions", typ: u(undefined, a(r("Action"))) },
+      {
+        json: "actions",
+        js: "actions",
+        typ: u(undefined, a(r("VehicleTypeNodePropertyAction"))),
+      },
       { json: "theta", js: "theta", typ: u(undefined, 3.14) },
       { json: "vehicleTypeId", js: "vehicleTypeId", typ: "" },
     ],
     "any",
   ),
-  Action: o(
+  VehicleTypeNodePropertyAction: o(
     [
       {
         json: "actionDescription",
@@ -697,15 +815,19 @@ const typeMap: any = {
       {
         json: "actionParameters",
         js: "actionParameters",
-        typ: u(undefined, a(r("ActionParameter"))),
+        typ: u(undefined, a(r("FluffyActionParameter"))),
       },
       { json: "actionType", js: "actionType", typ: "" },
-      { json: "blockingType", js: "blockingType", typ: "" },
-      { json: "required", js: "required", typ: u(undefined, true) },
+      { json: "blockingType", js: "blockingType", typ: r("BlockingType") },
+      {
+        json: "requirementType",
+        js: "requirementType",
+        typ: u(undefined, r("RequirementType")),
+      },
     ],
     "any",
   ),
-  ActionParameter: o(
+  FluffyActionParameter: o(
     [
       { json: "key", js: "key", typ: "" },
       { json: "value", js: "value", typ: "" },
@@ -748,4 +870,6 @@ const typeMap: any = {
     ],
     "any",
   ),
+  BlockingType: ["HARD", "NONE", "SOFT"],
+  RequirementType: ["CONDITIONAL", "OPTIONAL", "REQUIRED"],
 };

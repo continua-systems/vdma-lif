@@ -1,7 +1,7 @@
 import tempfile
 import unittest
 from vdma_lif.parser import LIFParser
-from vdma_lif.models import LIFLayoutCollection
+from vdma_lif.models import LIFLayoutCollection, RequirementType, BlockingType
 import json
 from pathlib import Path
 
@@ -88,8 +88,8 @@ class TestLIFParser(unittest.TestCase):
         action1 = vehicle_type1.actions[0]
         self.assertEqual(action1.action_type, "move")
         self.assertEqual(action1.action_description, "Move forward")
-        self.assertTrue(action1.required)
-        self.assertEqual(action1.blocking_type, "HARD")
+        self.assertEqual(action1.requirement_type, RequirementType.REQUIRED)
+        self.assertEqual(action1.blocking_type, BlockingType.HARD)
         self.assertEqual(len(action1.action_parameters), 2)
         self.assertEqual(action1.action_parameters[0].key, "speed")
         self.assertEqual(action1.action_parameters[0].value, "fast")

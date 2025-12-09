@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { describe, it } from "mocha";
 import { LIFParser } from "./";
-import { LIFLayoutCollection } from "./";
+import { LIFLayoutCollection, BlockingType, RequirementType } from "./";
 
 describe("LIFParser", () => {
   function assertLayoutCollection(layoutCollection: LIFLayoutCollection) {
@@ -49,8 +49,8 @@ describe("LIFParser", () => {
     const action1 = vehicleType1.actions![0];
     expect(action1.actionType).to.equal("move");
     expect(action1.actionDescription).to.equal("Move forward");
-    expect(action1.required).to.be.true;
-    expect(action1.blockingType).to.equal("HARD");
+    expect(action1.requirementType).to.equal(RequirementType.Required);
+    expect(action1.blockingType).to.equal(BlockingType.Hard);
     expect(action1.actionParameters).to.not.be.null;
     expect(action1.actionParameters![0].key).to.equal("speed");
     expect(action1.actionParameters![0].value).to.equal("fast");
@@ -81,5 +81,107 @@ describe("LIFParser", () => {
   it("should throw an error for invalid JSON string", () => {
     const invalidJson = "{ invalid json }";
     expect(() => LIFParser.fromJson(invalidJson)).to.throw(SyntaxError);
+  });
+
+  it("should parse valid JSON string", () => {
+    const validJson = `{
+      "metaInformation": {
+        "projectIdentification": "Sample Project",
+        "creator": "Sample Creator",
+        "exportTimestamp": "2069-07-21T00:37:33Z",
+        "lifVersion": "1.0.0"
+      },
+      "layouts": [
+        {
+          "layoutId": "layout-001",
+          "layoutName": "Main Layout",
+          "layoutVersion": "1.1",
+          "layoutLevelId": "level-001",
+          "layoutDescription": "Primary layout for testing.",
+          "nodes": [
+            {
+              "nodeId": "node-001",
+              "nodeName": "Node A",
+              "nodeDescription": "Entrance node.",
+              "mapId": "map-001",
+              "nodePosition": { "x": 1000.0, "y": 1500.0 },
+              "vehicleTypeNodeProperties": [
+                {
+                  "vehicleTypeId": "vehicle-001",
+                  "theta": 90.0,
+                  "actions": [
+                    {
+                      "actionType": "move",
+                      "actionDescription": "Move forward",
+                      "requirementType": "REQUIRED",
+                      "blockingType": "HARD",
+                      "actionParameters": [
+                        { "key": "speed", "value": "fast" },
+                        { "key": "acceleration", "value": "medium" }
+                      ]
+                    }
+                  ]
+                },
+                { "vehicleTypeId": "vehicle-002", "theta": 180.0, "actions": [] }
+              ]
+            },
+            {
+              "nodeId": "node-002",
+              "nodeName": "Node B",
+              "nodePosition": { "x": 2000.0, "y": 2500.0 },
+              "vehicleTypeNodeProperties": [{ "vehicleTypeId": "vehicle-002" }]
+            }
+          ],
+          "edges": [
+            {
+              "edgeId": "edge-001",
+              "startNodeId": "node-001",
+              "endNodeId": "node-002",
+              "vehicleTypeEdgeProperties": [
+                {
+                  "vehicleTypeId": "vehicle-001",
+                  "vehicleOrientation": 0.0,
+                  "orientationType": "TANGENTIAL",
+                  "rotationAllowed": true,
+                  "maxSpeed": 1.5,
+                  "maxRotationSpeed": 0.5,
+                  "loadRestriction": {
+                    "unloaded": true,
+                    "loaded": false,
+                    "loadSetNames": ["set1", "set2"]
+                  }
+                }
+              ]
+            }
+          ],
+          "stations": [
+            {
+              "stationId": "station-001",
+              "interactionNodeIds": ["node-001", "node-002"],
+              "stationName": "Station A",
+              "stationDescription": "Primary loading station.",
+              "stationPosition": { "x": 1000.0, "y": 1000.0, "theta": 0.0 }
+            }
+          ]
+        },
+        {
+          "layoutId": "layout-002",
+          "layoutName": "Secondary Layout",
+          "layoutVersion": "1.0",
+          "layoutLevelId": "level-002",
+          "nodes": [
+            {
+              "nodeId": "node-003",
+              "nodePosition": { "x": 3000.0, "y": 3500.0 },
+              "vehicleTypeNodeProperties": [{ "vehicleTypeId": "vehicle-003", "theta": 270.0 }]
+            }
+          ],
+          "edges": [],
+          "stations": []
+        }
+      ]
+    }`;
+    const layoutCollection = LIFParser.fromJson(validJson);
+    assertLayoutCollection(layoutCollection);
   });
 });

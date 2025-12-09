@@ -4,6 +4,8 @@
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
 
+using System.Globalization;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 #pragma warning disable CS8618
@@ -124,6 +126,15 @@ public partial class Edge
 public partial class VehicleTypeEdgeProperty
 {
     /// <summary>
+    ///     Actions that can be integrated into the order by the (third-party) master control system
+    ///     each time any vehicle with the corresponding vehicleTypeId is sent an order/order update
+    ///     that contains this edge. *Optional*.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("actions")]
+    public VehicleTypeEdgePropertyAction[]? Actions { get; set; }
+
+    /// <summary>
     ///     Load restrictions for this edge. *Optional*.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -169,6 +180,16 @@ public partial class VehicleTypeEdgeProperty
     public string? OrientationType { get; set; }
 
     /// <summary>
+    ///     true: Vehicles of the corresponding vehicleTypeId are allowed to enter into automatic
+    ///     management by the (third-party) master control system while on this edge. false: Vehicles
+    ///     are not allowed to enter into automatic management while on this edge. Default is true if
+    ///     not defined.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("reentryAllowed")]
+    public bool? ReentryAllowed { get; set; }
+
+    /// <summary>
     ///     Indicates if rotation is allowed while on the edge. *Optional*.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -209,6 +230,65 @@ public partial class VehicleTypeEdgeProperty
     [JsonRequired]
     [JsonPropertyName("vehicleTypeId")]
     public string VehicleTypeId { get; set; }
+}
+
+public partial class VehicleTypeEdgePropertyAction
+{
+    /// <summary>
+    ///     Description of the action. *Optional*.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("actionDescription")]
+    public string? ActionDescription { get; set; }
+
+    /// <summary>
+    ///     Parameters associated with the action. *Optional*.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("actionParameters")]
+    public PurpleActionParameter[]? ActionParameters { get; set; }
+
+    /// <summary>
+    ///     Type of action (e.g., move, load, unload).
+    /// </summary>
+    [JsonRequired]
+    [JsonPropertyName("actionType")]
+    public string ActionType { get; set; }
+
+    /// <summary>
+    ///     Specifies if the action is blocking. NONE: allows moving and other actions. SOFT: allows
+    ///     other actions, but not moving. HARD: is the only allowed action at this time.
+    /// </summary>
+    [JsonRequired]
+    [JsonPropertyName("blockingType")]
+    public BlockingType BlockingType { get; set; }
+
+    /// <summary>
+    ///     Defines if the action is required. REQUIRED: The (third-party) master control system must
+    ///     always communicate this action. CONDITIONAL: The action may or may not be required
+    ///     contingent upon various factors. OPTIONAL: The action may or may not be communicated at
+    ///     the master control system's discretion.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("requirementType")]
+    public RequirementType? RequirementType { get; set; }
+}
+
+public partial class PurpleActionParameter
+{
+    /// <summary>
+    ///     Key of the action parameter.
+    /// </summary>
+    [JsonRequired]
+    [JsonPropertyName("key")]
+    public string Key { get; set; }
+
+    /// <summary>
+    ///     Value of the action parameter.
+    /// </summary>
+    [JsonRequired]
+    [JsonPropertyName("value")]
+    public string Value { get; set; }
 }
 
 /// <summary>
@@ -362,7 +442,7 @@ public partial class VehicleTypeNodeProperty
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("actions")]
-    public Action[]? Actions { get; set; }
+    public VehicleTypeNodePropertyAction[]? Actions { get; set; }
 
     /// <summary>
     ///     Absolute orientation of the vehicle on the node in reference to the global origin’s
@@ -380,7 +460,7 @@ public partial class VehicleTypeNodeProperty
     public string VehicleTypeId { get; set; }
 }
 
-public partial class Action
+public partial class VehicleTypeNodePropertyAction
 {
     /// <summary>
     ///     Description of the action. *Optional*.
@@ -394,7 +474,7 @@ public partial class Action
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("actionParameters")]
-    public ActionParameter[]? ActionParameters { get; set; }
+    public FluffyActionParameter[]? ActionParameters { get; set; }
 
     /// <summary>
     ///     Type of action (e.g., move, load, unload).
@@ -404,21 +484,25 @@ public partial class Action
     public string ActionType { get; set; }
 
     /// <summary>
-    ///     Specifies if the action is blocking (HARD or SOFT).
+    ///     Specifies if the action is blocking. NONE: allows moving and other actions. SOFT: allows
+    ///     other actions, but not moving. HARD: is the only allowed action at this time.
     /// </summary>
     [JsonRequired]
     [JsonPropertyName("blockingType")]
-    public string BlockingType { get; set; }
+    public BlockingType BlockingType { get; set; }
 
     /// <summary>
-    ///     Whether the action is mandatory.
+    ///     Defines if the action is required. REQUIRED: The (third-party) master control system must
+    ///     always communicate this action. CONDITIONAL: The action may or may not be required
+    ///     contingent upon various factors. OPTIONAL: The action may or may not be communicated at
+    ///     the master control system's discretion.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("required")]
-    public bool? ActionRequired { get; set; }
+    [JsonPropertyName("requirementType")]
+    public RequirementType? RequirementType { get; set; }
 }
 
-public partial class ActionParameter
+public partial class FluffyActionParameter
 {
     /// <summary>
     ///     Key of the action parameter.
@@ -540,4 +624,243 @@ public partial class MetaInformation
     [JsonRequired]
     [JsonPropertyName("projectIdentification")]
     public string ProjectIdentification { get; set; }
+}
+
+/// <summary>
+///     Specifies if the action is blocking. NONE: allows moving and other actions. SOFT: allows
+///     other actions, but not moving. HARD: is the only allowed action at this time.
+/// </summary>
+public enum BlockingType
+{
+    Hard,
+    None,
+    Soft
+}
+
+/// <summary>
+///     Defines if the action is required. REQUIRED: The (third-party) master control system must
+///     always communicate this action. CONDITIONAL: The action may or may not be required
+///     contingent upon various factors. OPTIONAL: The action may or may not be communicated at
+///     the master control system's discretion.
+/// </summary>
+public enum RequirementType
+{
+    Conditional,
+    Optional,
+    Required
+}
+
+internal static class Converter
+{
+    public static readonly JsonSerializerOptions Settings = new(JsonSerializerDefaults.General)
+    {
+        Converters =
+        {
+            BlockingTypeConverter.Singleton,
+            RequirementTypeConverter.Singleton,
+            new DateOnlyConverter(),
+            new TimeOnlyConverter(),
+            IsoDateTimeOffsetConverter.Singleton
+        }
+    };
+}
+
+internal class BlockingTypeConverter : JsonConverter<BlockingType>
+{
+    public static readonly BlockingTypeConverter Singleton = new();
+
+    public override bool CanConvert(Type t)
+    {
+        return t == typeof(BlockingType);
+    }
+
+    public override BlockingType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        var value = reader.GetString();
+        switch (value)
+        {
+            case "HARD":
+                return BlockingType.Hard;
+
+            case "NONE":
+                return BlockingType.None;
+
+            case "SOFT":
+                return BlockingType.Soft;
+        }
+        throw new Exception("Cannot unmarshal type BlockingType");
+    }
+
+    public override void Write(Utf8JsonWriter writer, BlockingType value, JsonSerializerOptions options)
+    {
+        switch (value)
+        {
+            case BlockingType.Hard:
+                JsonSerializer.Serialize(writer, "HARD", options);
+                return;
+
+            case BlockingType.None:
+                JsonSerializer.Serialize(writer, "NONE", options);
+                return;
+
+            case BlockingType.Soft:
+                JsonSerializer.Serialize(writer, "SOFT", options);
+                return;
+        }
+        throw new Exception("Cannot marshal type BlockingType");
+    }
+}
+
+internal class RequirementTypeConverter : JsonConverter<RequirementType>
+{
+    public static readonly RequirementTypeConverter Singleton = new();
+
+    public override bool CanConvert(Type t)
+    {
+        return t == typeof(RequirementType);
+    }
+
+    public override RequirementType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        var value = reader.GetString();
+        switch (value)
+        {
+            case "CONDITIONAL":
+                return RequirementType.Conditional;
+
+            case "OPTIONAL":
+                return RequirementType.Optional;
+
+            case "REQUIRED":
+                return RequirementType.Required;
+        }
+        throw new Exception("Cannot unmarshal type RequirementType");
+    }
+
+    public override void Write(Utf8JsonWriter writer, RequirementType value, JsonSerializerOptions options)
+    {
+        switch (value)
+        {
+            case RequirementType.Conditional:
+                JsonSerializer.Serialize(writer, "CONDITIONAL", options);
+                return;
+
+            case RequirementType.Optional:
+                JsonSerializer.Serialize(writer, "OPTIONAL", options);
+                return;
+
+            case RequirementType.Required:
+                JsonSerializer.Serialize(writer, "REQUIRED", options);
+                return;
+        }
+        throw new Exception("Cannot marshal type RequirementType");
+    }
+}
+
+public class DateOnlyConverter : JsonConverter<DateOnly>
+{
+    private readonly string serializationFormat;
+
+    public DateOnlyConverter() : this(null)
+    {
+    }
+
+    public DateOnlyConverter(string? serializationFormat)
+    {
+        this.serializationFormat = serializationFormat ?? "yyyy-MM-dd";
+    }
+
+    public override DateOnly Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        var value = reader.GetString();
+        return DateOnly.Parse(value!);
+    }
+
+    public override void Write(Utf8JsonWriter writer, DateOnly value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString(serializationFormat));
+    }
+}
+
+public class TimeOnlyConverter : JsonConverter<TimeOnly>
+{
+    private readonly string serializationFormat;
+
+    public TimeOnlyConverter() : this(null)
+    {
+    }
+
+    public TimeOnlyConverter(string? serializationFormat)
+    {
+        this.serializationFormat = serializationFormat ?? "HH:mm:ss.fff";
+    }
+
+    public override TimeOnly Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        var value = reader.GetString();
+        return TimeOnly.Parse(value!);
+    }
+
+    public override void Write(Utf8JsonWriter writer, TimeOnly value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString(serializationFormat));
+    }
+}
+
+internal class IsoDateTimeOffsetConverter : JsonConverter<DateTimeOffset>
+{
+    private const string DefaultDateTimeFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK";
+
+    public static readonly IsoDateTimeOffsetConverter Singleton = new();
+    private CultureInfo? _culture;
+    private string? _dateTimeFormat;
+
+    public DateTimeStyles DateTimeStyles { get; set; } = DateTimeStyles.RoundtripKind;
+
+    public string? DateTimeFormat
+    {
+        get => _dateTimeFormat ?? string.Empty;
+        set => _dateTimeFormat = string.IsNullOrEmpty(value) ? null : value;
+    }
+
+    public CultureInfo Culture
+    {
+        get => _culture ?? CultureInfo.CurrentCulture;
+        set => _culture = value;
+    }
+
+    public override bool CanConvert(Type t)
+    {
+        return t == typeof(DateTimeOffset);
+    }
+
+    public override void Write(Utf8JsonWriter writer, DateTimeOffset value, JsonSerializerOptions options)
+    {
+        string text;
+
+        if ((DateTimeStyles & DateTimeStyles.AdjustToUniversal) == DateTimeStyles.AdjustToUniversal
+            || (DateTimeStyles & DateTimeStyles.AssumeUniversal) == DateTimeStyles.AssumeUniversal)
+        {
+            value = value.ToUniversalTime();
+        }
+
+        text = value.ToString(_dateTimeFormat ?? DefaultDateTimeFormat, Culture);
+
+        writer.WriteStringValue(text);
+    }
+
+    public override DateTimeOffset Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        var dateText = reader.GetString();
+
+        if (string.IsNullOrEmpty(dateText) == false)
+        {
+            if (!string.IsNullOrEmpty(_dateTimeFormat))
+            {
+                return DateTimeOffset.ParseExact(dateText, _dateTimeFormat, Culture, DateTimeStyles);
+            }
+            return DateTimeOffset.Parse(dateText, Culture, DateTimeStyles);
+        }
+        return default;
+    }
 }

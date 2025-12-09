@@ -11,10 +11,10 @@
   },
   "cleanupCommand": "jb cleanupcode Vdma.Lif.sln",
   "testCommand": "dotnet test",
-  "buildCommand": "dotnet pack",
+  "buildCommand": "dotnet pack -c Release",
   "publish": {
     "packageName": "Vdma.Lif",
-    "packageVersion": "1.0.0.5",
+    "packageVersion": "1.0.0.6",
     "packageDirectory": "Vdma.Lif/bin/Release"
   }
 }

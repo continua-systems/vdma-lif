@@ -1,21 +1,13 @@
 
 from dataclasses import dataclass
-from typing import List, Optional, Any, TypeVar, Callable, Type, cast
+from typing import Any, Optional, List, TypeVar, Callable, Type, cast
+from enum import Enum
 from datetime import datetime
 import dateutil.parser
 
 
 T = TypeVar("T")
-
-
-def from_bool(x: Any) -> bool:
-    assert isinstance(x, bool)
-    return x
-
-
-def from_list(f: Callable[[Any], T], x: Any) -> List[T]:
-    assert isinstance(x, list)
-    return [f(y) for y in x]
+EnumT = TypeVar("EnumT", bound=Enum)
 
 
 def from_str(x: Any) -> str:
@@ -37,6 +29,26 @@ def from_union(fs, x):
     assert False
 
 
+def from_list(f: Callable[[Any], T], x: Any) -> List[T]:
+    assert isinstance(x, list)
+    return [f(y) for y in x]
+
+
+def to_enum(c: Type[EnumT], x: Any) -> EnumT:
+    assert isinstance(x, c)
+    return x.value
+
+
+def to_class(c: Type[T], x: Any) -> dict:
+    assert isinstance(x, c)
+    return cast(Any, x).to_dict()
+
+
+def from_bool(x: Any) -> bool:
+    assert isinstance(x, bool)
+    return x
+
+
 def from_float(x: Any) -> float:
     assert isinstance(x, (float, int)) and not isinstance(x, bool)
     return float(x)
@@ -52,13 +64,99 @@ def from_int(x: Any) -> int:
     return x
 
 
-def to_class(c: Type[T], x: Any) -> dict:
-    assert isinstance(x, c)
-    return cast(Any, x).to_dict()
-
-
 def from_datetime(x: Any) -> datetime:
     return dateutil.parser.parse(x)
+
+
+@dataclass
+class PurpleActionParameter:
+    key: str
+    """Key of the action parameter."""
+
+    value: str
+    """Value of the action parameter."""
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'PurpleActionParameter':
+        assert isinstance(obj, dict)
+        key = from_str(obj.get("key"))
+        value = from_str(obj.get("value"))
+        return PurpleActionParameter(key, value)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["key"] = from_str(self.key)
+        result["value"] = from_str(self.value)
+        return result
+
+
+class BlockingType(Enum):
+    """Specifies if the action is blocking. NONE: allows moving and other actions. SOFT: allows
+    other actions, but not moving. HARD: is the only allowed action at this time.
+    """
+    HARD = "HARD"
+    NONE = "NONE"
+    SOFT = "SOFT"
+
+
+class RequirementType(Enum):
+    """Defines if the action is required. REQUIRED: The (third-party) master control system must
+    always communicate this action. CONDITIONAL: The action may or may not be required
+    contingent upon various factors. OPTIONAL: The action may or may not be communicated at
+    the master control system's discretion.
+    """
+    CONDITIONAL = "CONDITIONAL"
+    OPTIONAL = "OPTIONAL"
+    REQUIRED = "REQUIRED"
+
+
+@dataclass
+class VehicleTypeEdgePropertyAction:
+    action_type: str
+    """Type of action (e.g., move, load, unload)."""
+
+    blocking_type: BlockingType
+    """Specifies if the action is blocking. NONE: allows moving and other actions. SOFT: allows
+    other actions, but not moving. HARD: is the only allowed action at this time.
+    """
+    action_description: Optional[str] = None
+    """Description of the action. *Optional*."""
+
+    action_parameters: Optional[List[PurpleActionParameter]] = None
+    """Parameters associated with the action. *Optional*."""
+
+    requirement_type: Optional[RequirementType] = None
+    """Defines if the action is required. REQUIRED: The (third-party) master control system must
+    always communicate this action. CONDITIONAL: The action may or may not be required
+    contingent upon various factors. OPTIONAL: The action may or may not be communicated at
+    the master control system's discretion.
+    """
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'VehicleTypeEdgePropertyAction':
+        assert isinstance(obj, dict)
+        action_type = from_str(obj.get("actionType"))
+        blocking_type = BlockingType(obj.get("blockingType"))
+        action_description = from_union([from_str, from_none], obj.get("actionDescription"))
+        action_parameters = from_union([lambda x: from_list(
+            PurpleActionParameter.from_dict, x), from_none], obj.get("actionParameters"))
+        requirement_type = from_union([RequirementType, from_none], obj.get("requirementType"))
+        return VehicleTypeEdgePropertyAction(action_type, blocking_type,
+                                             action_description, action_parameters, requirement_type)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["actionType"] = from_str(self.action_type)
+        result["blockingType"] = to_enum(BlockingType, self.blocking_type)
+        if self.action_description is not None:
+            result["actionDescription"] = from_union([from_str, from_none], self.action_description)
+        if self.action_parameters is not None:
+            result["actionParameters"] = from_union([lambda x: from_list(
+                lambda x: to_class(PurpleActionParameter, x), x), from_none], self.action_parameters)
+        if self.requirement_type is not None:
+            result["requirementType"] = from_union(
+                [lambda x: to_enum(RequirementType, x), from_none], self.requirement_type)
+        return result
 
 
 @dataclass
@@ -156,6 +254,11 @@ class VehicleTypeEdgeProperty:
     vehicle_type_id: str
     """Identifier for the vehicle type."""
 
+    actions: Optional[List[VehicleTypeEdgePropertyAction]] = None
+    """Actions that can be integrated into the order by the (third-party) master control system
+    each time any vehicle with the corresponding vehicleTypeId is sent an order/order update
+    that contains this edge. *Optional*.
+    """
     load_restriction: Optional[LoadRestriction] = None
     """Load restrictions for this edge. *Optional*."""
 
@@ -177,6 +280,12 @@ class VehicleTypeEdgeProperty:
     orientation_type: Optional[str] = None
     """Type of orientation (e.g., TANGENTIAL)."""
 
+    reentry_allowed: Optional[bool] = None
+    """true: Vehicles of the corresponding vehicleTypeId are allowed to enter into automatic
+    management by the (third-party) master control system while on this edge. false: Vehicles
+    are not allowed to enter into automatic management while on this edge. Default is true if
+    not defined.
+    """
     rotation_allowed: Optional[bool] = None
     """Indicates if rotation is allowed while on the edge. *Optional*."""
 
@@ -196,23 +305,29 @@ class VehicleTypeEdgeProperty:
     def from_dict(obj: Any) -> 'VehicleTypeEdgeProperty':
         assert isinstance(obj, dict)
         vehicle_type_id = from_str(obj.get("vehicleTypeId"))
+        actions = from_union([lambda x: from_list(VehicleTypeEdgePropertyAction.from_dict, x),
+                             from_none], obj.get("actions"))
         load_restriction = from_union([LoadRestriction.from_dict, from_none], obj.get("loadRestriction"))
         max_height = from_union([from_float, from_none], obj.get("maxHeight"))
         max_rotation_speed = from_union([from_float, from_none], obj.get("maxRotationSpeed"))
         max_speed = from_union([from_float, from_none], obj.get("maxSpeed"))
         min_height = from_union([from_float, from_none], obj.get("minHeight"))
         orientation_type = from_union([from_str, from_none], obj.get("orientationType"))
+        reentry_allowed = from_union([from_bool, from_none], obj.get("reentryAllowed"))
         rotation_allowed = from_union([from_bool, from_none], obj.get("rotationAllowed"))
         rotation_at_end_node_allowed = from_union([from_str, from_none], obj.get("rotationAtEndNodeAllowed"))
         rotation_at_start_node_allowed = from_union([from_str, from_none], obj.get("rotationAtStartNodeAllowed"))
         trajectory = from_union([Trajectory.from_dict, from_none], obj.get("trajectory"))
         vehicle_orientation = from_union([from_float, from_none], obj.get("vehicleOrientation"))
-        return VehicleTypeEdgeProperty(vehicle_type_id, load_restriction, max_height, max_rotation_speed, max_speed, min_height, orientation_type,
-                                       rotation_allowed, rotation_at_end_node_allowed, rotation_at_start_node_allowed, trajectory, vehicle_orientation)
+        return VehicleTypeEdgeProperty(vehicle_type_id, actions, load_restriction, max_height, max_rotation_speed, max_speed, min_height, orientation_type,
+                                       reentry_allowed, rotation_allowed, rotation_at_end_node_allowed, rotation_at_start_node_allowed, trajectory, vehicle_orientation)
 
     def to_dict(self) -> dict:
         result: dict = {}
         result["vehicleTypeId"] = from_str(self.vehicle_type_id)
+        if self.actions is not None:
+            result["actions"] = from_union([lambda x: from_list(lambda x: to_class(
+                VehicleTypeEdgePropertyAction, x), x), from_none], self.actions)
         if self.load_restriction is not None:
             result["loadRestriction"] = from_union(
                 [lambda x: to_class(LoadRestriction, x), from_none], self.load_restriction)
@@ -226,6 +341,8 @@ class VehicleTypeEdgeProperty:
             result["minHeight"] = from_union([to_float, from_none], self.min_height)
         if self.orientation_type is not None:
             result["orientationType"] = from_union([from_str, from_none], self.orientation_type)
+        if self.reentry_allowed is not None:
+            result["reentryAllowed"] = from_union([from_bool, from_none], self.reentry_allowed)
         if self.rotation_allowed is not None:
             result["rotationAllowed"] = from_union([from_bool, from_none], self.rotation_allowed)
         if self.rotation_at_end_node_allowed is not None:
@@ -300,7 +417,7 @@ class NodePosition:
 
 
 @dataclass
-class ActionParameter:
+class FluffyActionParameter:
     key: str
     """Key of the action parameter."""
 
@@ -308,11 +425,11 @@ class ActionParameter:
     """Value of the action parameter."""
 
     @staticmethod
-    def from_dict(obj: Any) -> 'ActionParameter':
+    def from_dict(obj: Any) -> 'FluffyActionParameter':
         assert isinstance(obj, dict)
         key = from_str(obj.get("key"))
         value = from_str(obj.get("value"))
-        return ActionParameter(key, value)
+        return FluffyActionParameter(key, value)
 
     def to_dict(self) -> dict:
         result: dict = {}
@@ -322,44 +439,51 @@ class ActionParameter:
 
 
 @dataclass
-class Action:
+class VehicleTypeNodePropertyAction:
     action_type: str
     """Type of action (e.g., move, load, unload)."""
 
-    blocking_type: str
-    """Specifies if the action is blocking (HARD or SOFT)."""
-
+    blocking_type: BlockingType
+    """Specifies if the action is blocking. NONE: allows moving and other actions. SOFT: allows
+    other actions, but not moving. HARD: is the only allowed action at this time.
+    """
     action_description: Optional[str] = None
     """Description of the action. *Optional*."""
 
-    action_parameters: Optional[List[ActionParameter]] = None
+    action_parameters: Optional[List[FluffyActionParameter]] = None
     """Parameters associated with the action. *Optional*."""
 
-    required: Optional[bool] = None
-    """Whether the action is mandatory."""
+    requirement_type: Optional[RequirementType] = None
+    """Defines if the action is required. REQUIRED: The (third-party) master control system must
+    always communicate this action. CONDITIONAL: The action may or may not be required
+    contingent upon various factors. OPTIONAL: The action may or may not be communicated at
+    the master control system's discretion.
+    """
 
     @staticmethod
-    def from_dict(obj: Any) -> 'Action':
+    def from_dict(obj: Any) -> 'VehicleTypeNodePropertyAction':
         assert isinstance(obj, dict)
         action_type = from_str(obj.get("actionType"))
-        blocking_type = from_str(obj.get("blockingType"))
+        blocking_type = BlockingType(obj.get("blockingType"))
         action_description = from_union([from_str, from_none], obj.get("actionDescription"))
-        action_parameters = from_union([lambda x: from_list(ActionParameter.from_dict, x),
-                                       from_none], obj.get("actionParameters"))
-        required = from_union([from_bool, from_none], obj.get("required"))
-        return Action(action_type, blocking_type, action_description, action_parameters, required)
+        action_parameters = from_union([lambda x: from_list(
+            FluffyActionParameter.from_dict, x), from_none], obj.get("actionParameters"))
+        requirement_type = from_union([RequirementType, from_none], obj.get("requirementType"))
+        return VehicleTypeNodePropertyAction(action_type, blocking_type,
+                                             action_description, action_parameters, requirement_type)
 
     def to_dict(self) -> dict:
         result: dict = {}
         result["actionType"] = from_str(self.action_type)
-        result["blockingType"] = from_str(self.blocking_type)
+        result["blockingType"] = to_enum(BlockingType, self.blocking_type)
         if self.action_description is not None:
             result["actionDescription"] = from_union([from_str, from_none], self.action_description)
         if self.action_parameters is not None:
             result["actionParameters"] = from_union([lambda x: from_list(
-                lambda x: to_class(ActionParameter, x), x), from_none], self.action_parameters)
-        if self.required is not None:
-            result["required"] = from_union([from_bool, from_none], self.required)
+                lambda x: to_class(FluffyActionParameter, x), x), from_none], self.action_parameters)
+        if self.requirement_type is not None:
+            result["requirementType"] = from_union(
+                [lambda x: to_enum(RequirementType, x), from_none], self.requirement_type)
         return result
 
 
@@ -368,7 +492,7 @@ class VehicleTypeNodeProperty:
     vehicle_type_id: str
     """Identifier for the vehicle type."""
 
-    actions: Optional[List[Action]] = None
+    actions: Optional[List[VehicleTypeNodePropertyAction]] = None
     """List of actions that the vehicle can perform at the node. *Optional*."""
 
     theta: Optional[float] = None
@@ -380,7 +504,8 @@ class VehicleTypeNodeProperty:
     def from_dict(obj: Any) -> 'VehicleTypeNodeProperty':
         assert isinstance(obj, dict)
         vehicle_type_id = from_str(obj.get("vehicleTypeId"))
-        actions = from_union([lambda x: from_list(Action.from_dict, x), from_none], obj.get("actions"))
+        actions = from_union([lambda x: from_list(VehicleTypeNodePropertyAction.from_dict, x),
+                             from_none], obj.get("actions"))
         theta = from_union([from_float, from_none], obj.get("theta"))
         return VehicleTypeNodeProperty(vehicle_type_id, actions, theta)
 
@@ -388,8 +513,8 @@ class VehicleTypeNodeProperty:
         result: dict = {}
         result["vehicleTypeId"] = from_str(self.vehicle_type_id)
         if self.actions is not None:
-            result["actions"] = from_union([lambda x: from_list(
-                lambda x: to_class(Action, x), x), from_none], self.actions)
+            result["actions"] = from_union([lambda x: from_list(lambda x: to_class(
+                VehicleTypeNodePropertyAction, x), x), from_none], self.actions)
         if self.theta is not None:
             result["theta"] = from_union([to_float, from_none], self.theta)
         return result

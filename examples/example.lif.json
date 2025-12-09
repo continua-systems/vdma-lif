@@ -30,7 +30,7 @@
                 {
                   "actionType": "move",
                   "actionDescription": "Move forward",
-                  "required": true,
+                  "requirementType": "REQUIRED",
                   "blockingType": "HARD",
                   "actionParameters": [
                     {
@@ -52,7 +52,7 @@
                 {
                   "actionType": "load",
                   "actionDescription": "Load cargo",
-                  "required": false,
+                  "requirementType": "OPTIONAL",
                   "blockingType": "SOFT"
                 }
               ]

@@ -74,19 +74,19 @@ npm install
 
 ### Generate
 ```
-npm generate:python
+npm run generate:python
 ```
 
 ## C#
 ### Dependencies
-- .NET 8.0
+- .NET >=8.0
 - Install Resharper CLI
     ```
     dotnet tool install -g JetBrains.ReSharper.GlobalTools
     ```
 ### Generate
 ```
-npm generate:csharp
+npm run generate:csharp
 ```
 
 ## TypeScript
@@ -99,7 +99,7 @@ npm generate:csharp
     ```
 ### Generate
 ```
-npm generate:typescript
+npm run generate:typescript
 ```
 
 ### Dependencies

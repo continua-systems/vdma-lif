@@ -71,7 +71,7 @@ public static class LifJsonParser
     /// </exception>
     public static LifLayoutCollection? FromJson(string jsonData)
     {
-        var options = new JsonSerializerOptions
+        var options = new JsonSerializerOptions(Converter.Settings)
         {
             PropertyNameCaseInsensitive = true
         };
@@ -88,7 +88,7 @@ public static class LifJsonParser
     /// <returns>Serialized json string</returns>
     public static string ToJson(this LifLayoutCollection layoutCollection, bool indented = false)
     {
-        var options = new JsonSerializerOptions
+        var options = new JsonSerializerOptions(Converter.Settings)
         {
             WriteIndented = indented
         };

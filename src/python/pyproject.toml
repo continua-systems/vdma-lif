@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vdma-lif"
-version = "1.0.0.6"
+version = "1.0.0.7"
 description = "JSON parsers and models for the VDMA - LIF (Layout Interchange Format), which is used for defining track layouts and exchanging information between the integrator of driverless transport vehicles and a third-party master control system."
 readme = "README.md"
 authors = [{ name = "Continua Systems GmbH", email = "info@continua.systems" }]
